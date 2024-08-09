@@ -6,10 +6,6 @@ from astropy import constants as const, units as u
 
 os.environ["OMP_NUM_THREADS"] = "1"
 
-sys.path.insert(0, '/home/gill/gradschool/research/ACT/szpack.v2.0/szpack.v2.0/python')
-sys.path.insert(0, '/home/gill/szpack.v2.0/python')
-sys.path.insert(0, '/home/a/ahincks/gillajay/szpack.v2.0/python')
-
 warnings.filterwarnings('ignore')
 
 dir_ajay_local = "/home/gill/research/ACT/"
