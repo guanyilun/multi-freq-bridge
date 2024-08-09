@@ -19,18 +19,9 @@ from astropy.cosmology import Planck18
 import bandpass as bp
 
 plt.rcParams.update({'font.size': 18})
-os.environ["OMP_NUM_THREADS"] = "1"
-sys.path.insert(0, '/home/gill/gradschool/research/ACT/szpack.v2.0/szpack.v2.0/python')
-sys.path.insert(0, '/home/gill/szpack.v2.0/python')
-sys.path.insert(0, '/home/a/ahincks/gillajay/szpack.v2.0/python')
 warnings.filterwarnings('ignore')
 
-dire_hen = f"/home/gill/ACT/" # hen
-dire_scinet = f"/home/a/ahincks/gillajay/scratch/"
-dire_tiger = f"/scratch/gpfs/ag5103/"
-dire_local = "/home/gill/research/act/data/"
-
-dire_base = dire_scinet
+dire_base = os.environ["DIRE_BASE"]
 
 def coord_from_ref(ref_ra, ref_dec, des_ra, des_dec, delta):
     """
@@ -171,6 +162,11 @@ def get_config_file(config_file):
             config_data = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             print(exc)
+
+    # add some environment variables to config_data for backward compatibility
+    config_data["act_data_dir"] = os.environ["ACT_DATADIR"]
+    config_data["planck_data_dir"] = os.environ["PLANCK_DATADIR"]
+
     return config_data
 
 def get_rho_crit(H_z):

@@ -128,8 +128,3 @@ data:
 - 353_npipe_planck_sky
 - 545_npipe_planck_sky
 - 857_npipe_planck_sky
-
-act_data_dir_dr6v2: /home/a/ahincks/gillajay/scratch/bridge/dr6v2/
-act_data_dir_dr6v4: /home/a/ahincks/gillajay/scratch/bridge/dr6v4/
-planck_data_dir: /home/a/ahincks/gillajay/scratch/bridge/cutout_planck/
-passband_dir: /home/a/ahincks/gillajay/scratch/passbands/
