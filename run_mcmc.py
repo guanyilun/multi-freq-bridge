@@ -6,23 +6,17 @@ from pixell import enmap
 import emcee
 import itertools
 import pathlib
-import sys
 import glob
 import os
 import warnings
+warnings.filterwarnings('ignore')
+
+import sys
+sys.path.insert(0, "src")
 
 import utils as ut
 import model
 
-#sys.path.insert(0, "../")
-os.environ["OMP_NUM_THREADS"] = "1"
-sys.path.insert(0, '/home/gill/gradschool/research/ACT/szpack.v2.0/szpack.v2.0/python')
-sys.path.insert(0, '/home/gill/szpack.v2.0/python')
-sys.path.insert(0, '/home/a/ahincks/gillajay/szpack.v2.0/python')
-sys.path.insert(0, '/home/ag5103/szpack.v2.0/python')
-
-warnings.filterwarnings('ignore')
-    
 def get_initial_params(cf, n_walkers):
     
     # cluster 1: Abell 401

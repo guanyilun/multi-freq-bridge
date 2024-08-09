@@ -1,0 +1,6 @@
+astropy
+pixell
+emcee
+numba
+scipy
+schwimmbad
