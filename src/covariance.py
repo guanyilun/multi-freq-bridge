@@ -8,11 +8,9 @@ from scipy.ndimage import gaussian_filter
 
 import utils as ut
 
-#sys.path.insert(0, "../")
 os.environ["OMP_NUM_THREADS"] = "1"
-sys.path.insert(0, '/home/gill/gradschool/research/ACT/szpack.v2.0/szpack.v2.0/python')
-sys.path.insert(0, '/home/gill/szpack.v2.0/python')
-sys.path.insert(0, '/home/a/ahincks/gillajay/szpack.v2.0/python')
+# sys.path.insert(0, '/home/a/ahincks/gillajay/szpack.v2.0/python')
+
 warnings.filterwarnings('ignore')
 
 def sim_check(cf):
@@ -171,13 +169,13 @@ def get_covariance(freq1,
         # SIGNAL COVARIANCE
         apod_mask1 = (enmap.apod(coadd1_map*0+1, cf['apod_pix']))
         coadd1_map_apod = coadd1_map * apod_mask1
-        coadd1_map_norm = np.fft.fft2(coadd1_map_apod) / np.mean(apod_mask1)
+        coadd1_map_norm = np.fft.fft2(coadd1_map_apod) 
 
         apod_mask2 = (enmap.apod(coadd2_map*0+1, cf['apod_pix']))
         coadd2_map_apod = coadd2_map * apod_mask2
-        coadd2_map_norm = np.fft.fft2(coadd2_map_apod) / np.mean(apod_mask2)
+        coadd2_map_norm = np.fft.fft2(coadd2_map_apod) 
 
-        spsd = coadd1_map_norm * np.conjugate(coadd2_map_norm)
+        spsd = coadd1_map_norm * np.conjugate(coadd2_map_norm) / np.mean(apod_mask1 * apod_mask2)
 
         # Subtract the noise covariance from the signal cov from each region
         if (noise_type_bool): 

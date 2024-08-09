@@ -12,12 +12,12 @@ sys.path.insert(0, '/home/a/ahincks/gillajay/szpack.v2.0/python')
 
 warnings.filterwarnings('ignore')
 
-dire_hen = "/home/gill/ACT/" # hen
-dire_scinet = "/home/a/ahincks/gillajay/scratch/"
-dire_tiger = "/scratch/gpfs/ag5103/"
-dire_local = "/home/gill/research/act/data/"
+dir_ajay_local = "/home/gill/research/ACT/"
+# dir_yilun_local = "/home/yilun/Research/ACT/" # Yilun's local path
+# dir_scinet = 
+# dir_CITA = 
 
-dire_base = dire_scinet
+dire_base = dir_ajay_local
 
 def freq_to_x(frequency):
     frequency *= u.GHz
