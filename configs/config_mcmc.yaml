@@ -4,12 +4,18 @@ region_center_ra: 0
 region_center_dec: 0
 region_width: 2.25
 
-c1_ra: 44.751
-c1_dec: 13.572
-c1_ra_min: 44.651
-c1_ra_max: 44.851
-c1_dec_min: 13.472
-c1_dec_max: 13.672
+  #c1_ra: 44.751
+  #c1_dec: 13.572
+  #c1_ra_min: 44.651
+  #c1_ra_max: 44.851
+
+c1_ra: 0.1593255999999954 
+c1_dec: 0.2720020999999999
+c1_ra_min: 0.05932560000000109
+c1_ra_max: 0.2593255999999968
+c1_dec_min: 0.17200210000000027
+c1_dec_max: 0.37200210000000133
+c1_muo: -0.5566122489553409
 c1_beta_min: 0.1
 c1_beta_max: 3.5 
 c1_rc_arcmin_min: 0.1
@@ -29,12 +35,20 @@ c1_Dtau_max: 0.01
 c1_A_D_min: 0
 c1_A_D_max: 1000000
 
-c2_ra: 44.473
-c2_dec: 13.03
-c2_ra_min: 44.373
-c2_ra_max: 44.573
-c2_dec_min: 12.93
-c2_dec_max: 13.13
+  #c2_ra: 44.473
+  #c2_dec: 13.03
+  #c2_ra_min: 44.373
+  #c2_ra_max: 44.573
+  #c2_dec_min: 12.93
+  #c2_dec_max: 13.13
+
+c2_ra: -0.11867440000000329 
+c2_dec: -0.2699978999999999
+c2_ra_min: -0.2186744000000047
+c2_ra_max: -0.018674400000001867
+c2_dec_min: -0.36999789999999955
+c2_dec_max: -0.16999789999999848
+c2_muo: -0.5606024845891494
 c2_beta_min: 0.1
 c2_beta_max: 3.5
 c2_rc_arcmin_min: 0.1
@@ -54,13 +68,22 @@ c2_Dtau_max: 0.01
 c2_A_D_min: 0
 c2_A_D_max: 1000000
 
-fil_ra: 44.68
-fil_dec: 13.37
+  #fil_ra: 44.68
+  #fil_dec: 13.37
+  #fil_z: 0.072735
+  #fil_ra_min: 44.58
+  #fil_ra_max: 44.78
+  #fil_dec_min: 13.2
+  #fil_dec_max: 13.47
+
+fil_ra: 0.08832559999999745 
+fil_dec: 0.07000209999999996
+fil_muo: -0.5576451231598584
 fil_z: 0.072735
-fil_ra_min: 44.58
-fil_ra_max: 44.78
-fil_dec_min: 13.2
-fil_dec_max: 13.47
+fil_ra_min: -0.01167440000000397
+fil_ra_max: 0.18832559999999887
+fil_dec_min: -0.09999789999999997
+fil_dec_max: 0.17000210000000138
 fil_l0_min_arcmin: 0
 fil_l0_max_arcmin: 30
 fil_w0_min_arcmin: 0
@@ -80,11 +103,11 @@ v_avg_max: 15000
 v_delta_min: -15000
 v_delta_max: 15000
 
-beam_version: 'dr6v4'
+beam_version: 'dr6v2'
 
 n_walkers: 100 
 n_iter: 100000000
-mcmc_filename: run_iso_dust_dr6v4.h5
+mcmc_filename: run_test.h5
 apod_pix: 20
 system_type: real
 noise_type: inst
@@ -94,7 +117,7 @@ rad_avg_total: 0
 rad_avg_bsize: 200
 smooth_noise: 0
 smooth_signal: 0
-smooth_total: 0 
+smooth_total: 1 
 smooth_signal_type: gaussian
 smooth_noise_type: gaussian
 smooth_total_type: gaussian
@@ -109,8 +132,8 @@ data:
   #- 150_pa4_act_dr6v2
   #- 220_pa4_act_dr6v2
   #- 150_pa5_act_dr6v2
-  #- 98_pa5_act_dr6v2
-  #- 98_pa6_act_dr6v2
+- 98_pa5_act_dr6v2
+- 98_pa6_act_dr6v2
 - 150_pa6_act_dr6v2
   #- 150_pa4_act_dr6v4
   #- 220_pa4_act_dr6v4
@@ -122,7 +145,7 @@ data:
   #- 44_npipe_planck_sky
   #- 70_npipe_planck_sky
 - 100_npipe_planck_sky
-  #- 143_npipe_planck_sky
+- 143_npipe_planck_sky
   #- 217_npipe_planck_sky
   #- 353_npipe_planck_sky
   #- 545_npipe_planck_sky
