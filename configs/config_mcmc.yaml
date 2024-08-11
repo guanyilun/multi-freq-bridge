@@ -2,14 +2,15 @@
 #region_center_dec: 13.2999979
 region_center_ra: 0
 region_center_dec: 0
-region_width: 2.25
+region_width:
+  2.25
 
   #c1_ra: 44.751
   #c1_dec: 13.572
   #c1_ra_min: 44.651
   #c1_ra_max: 44.851
 
-c1_ra: 0.1593255999999954 
+c1_ra: 0.1593255999999954
 c1_dec: 0.2720020999999999
 c1_ra_min: 0.05932560000000109
 c1_ra_max: 0.2593255999999968
@@ -17,9 +18,9 @@ c1_dec_min: 0.17200210000000027
 c1_dec_max: 0.37200210000000133
 c1_muo: -0.5566122489553409
 c1_beta_min: 0.1
-c1_beta_max: 3.5 
+c1_beta_max: 3.5
 c1_rc_arcmin_min: 0.1
-c1_rc_arcmin_max: 8.5 
+c1_rc_arcmin_max: 8.5
 c1_R_min: 0.2
 c1_R_max: 5.0
 c1_theta_min: 0.0
@@ -29,9 +30,9 @@ c1_Te_std: 0.25
 c1_mass: 10.2
 c1_z: 0.073664
 c1_Te_min: 1
-c1_Te_max: 15 
+c1_Te_max: 15
 c1_Dtau_min: 0
-c1_Dtau_max: 0.01
+c1_Dtau_max: 0.02
 c1_A_D_min: 0
 c1_A_D_max: 1000000
 
@@ -42,7 +43,7 @@ c1_A_D_max: 1000000
   #c2_dec_min: 12.93
   #c2_dec_max: 13.13
 
-c2_ra: -0.11867440000000329 
+c2_ra: -0.11867440000000329
 c2_dec: -0.2699978999999999
 c2_ra_min: -0.2186744000000047
 c2_ra_max: -0.018674400000001867
@@ -52,7 +53,7 @@ c2_muo: -0.5606024845891494
 c2_beta_min: 0.1
 c2_beta_max: 3.5
 c2_rc_arcmin_min: 0.1
-c2_rc_arcmin_max: 8.5 
+c2_rc_arcmin_max: 8.5
 c2_R_min: 0.2
 c2_R_max: 5.0
 c2_theta_min: 0.0
@@ -64,9 +65,10 @@ c2_z: 0.071806
 c2_Te_min: 1
 c2_Te_max: 15
 c2_Dtau_min: 0
-c2_Dtau_max: 0.01
+c2_Dtau_max: 0.02
 c2_A_D_min: 0
-c2_A_D_max: 1000000
+c2_A_D_max:
+  1000000
 
   #fil_ra: 44.68
   #fil_dec: 13.37
@@ -76,7 +78,7 @@ c2_A_D_max: 1000000
   #fil_dec_min: 13.2
   #fil_dec_max: 13.47
 
-fil_ra: 0.08832559999999745 
+fil_ra: 0.08832559999999745
 fil_dec: 0.07000209999999996
 fil_muo: -0.5576451231598584
 fil_z: 0.072735
@@ -89,23 +91,23 @@ fil_l0_max_arcmin: 30
 fil_w0_min_arcmin: 0
 fil_w0_max_arcmin: 30
 fil_Dtau_min: 0
-fil_Dtau_max: 0.005
+fil_Dtau_max: 0.007
 
 fil_A_D_min: 0
 fil_A_D_max: 1000000
 fil_Te_min: 1
-fil_Te_max: 15 
+fil_Te_max: 15
 fil_Te_mean: 6.52
 fil_Te_std: 0.35
 
-v_avg_min: -15000
-v_avg_max: 15000
+v_avg_min: -1000
+v_avg_max: 1000
 v_delta_min: -15000
 v_delta_max: 15000
 
-beam_version: 'dr6v2'
+beam_version: "dr6v2"
 
-n_walkers: 100 
+n_walkers: 100
 n_iter: 100000000
 mcmc_filename: run_test.h5
 apod_pix: 20
@@ -117,36 +119,35 @@ rad_avg_total: 0
 rad_avg_bsize: 200
 smooth_noise: 0
 smooth_signal: 0
-smooth_total: 1 
+smooth_total: 1
 smooth_signal_type: gaussian
 smooth_noise_type: gaussian
 smooth_total_type: gaussian
 smooth_signal_pix: 1.5
 smooth_noise_pix: 1.5
 smooth_total_pix: 1.25
-temp_model_type: isothermal 
-repeat_h5: 'true'
-fit_dust: 'true'
+temp_model_type: isothermal
+repeat_h5: "true"
 
 data:
   #- 150_pa4_act_dr6v2
-  #- 220_pa4_act_dr6v2
-  #- 150_pa5_act_dr6v2
-- 98_pa5_act_dr6v2
-- 98_pa6_act_dr6v2
-- 150_pa6_act_dr6v2
-  #- 150_pa4_act_dr6v4
-  #- 220_pa4_act_dr6v4
-  #- 150_pa5_act_dr6v4
-  #- 98_pa5_act_dr6v4
-  #- 98_pa6_act_dr6v4
-  #- 150_pa6_act_dr6v4
-  #- 30_npipe_planck_sky
-  #- 44_npipe_planck_sky
-  #- 70_npipe_planck_sky
-- 100_npipe_planck_sky
-- 143_npipe_planck_sky
-  #- 217_npipe_planck_sky
-  #- 353_npipe_planck_sky
-  #- 545_npipe_planck_sky
-  #- 857_npipe_planck_sky
+  - 220_pa4_act_dr6v2
+  - 150_pa5_act_dr6v2
+  - 98_pa5_act_dr6v2
+  - 98_pa6_act_dr6v2
+  - 150_pa6_act_dr6v2
+    #- 150_pa4_act_dr6v4
+    #- 220_pa4_act_dr6v4
+    #- 150_pa5_act_dr6v4
+    #- 98_pa5_act_dr6v4
+    #- 98_pa6_act_dr6v4
+    #- 150_pa6_act_dr6v4
+    #- 30_npipe_planck_sky
+    #- 44_npipe_planck_sky
+    #- 70_npipe_planck_sky
+  - 100_npipe_planck_sky
+  - 143_npipe_planck_sky
+  - 217_npipe_planck_sky
+  - 353_npipe_planck_sky
+    #- 545_npipe_planck_sky
+    #- 857_npipe_planck_sky

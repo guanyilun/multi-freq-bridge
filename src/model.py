@@ -1,13 +1,6 @@
 import numpy as np
-import sys
 import warnings
 import utils as ut
-
-sys.path.insert(0, '/home/ag5103/szpack.v2.0/python')
-sys.path.insert(0, "../")
-#os.environ["OMP_NUM_THREADS"] = "1"
-sys.path.insert(0, '/home/gill/research/act/szpack.v2.0/python')
-sys.path.insert(0, '/home/a/ahincks/gillajay/szpack.v2.0/python')
 
 warnings.filterwarnings('ignore')
 
@@ -19,34 +12,21 @@ const_h = 6.626070149999999e-25 # J / GHz
 
 class Filament():
 
-    def __init__(self, theta, fit_dust):
+    def __init__(self, theta):
        
-        self.fit_dust = fit_dust
         self.initialize(theta=theta)
 
     def initialize(self, theta):
 
-        if self.fit_dust == 'true':
-            self.ra_pix = theta[18]
-            self.dec_pix = theta[19]
-            self.l0_pix = theta[20]
-            self.w0_pix = theta[21]
-            self.Dtau = theta[22]
-            self.Te = theta[23]
-            self.A_D = theta[24]
-            self.v_avg = theta[25]
-            self.theta_bridge = np.deg2rad(117)
-
-        elif self.fit_dust == 'false':
-            self.ra_pix = theta[16]
-            self.dec_pix = theta[17]
-            self.l0_pix = theta[18]
-            self.w0_pix = theta[19]
-            self.Dtau = theta[20]
-            self.Te = theta[21]
-            self.v_avg = theta[22]
-
-            self.theta_bridge = np.deg2rad(117)
+        self.ra_pix = theta[18]
+        self.dec_pix = theta[19]
+        self.l0_pix = theta[20]
+        self.w0_pix = theta[21]
+        self.Dtau = theta[22]
+        self.Te = theta[23]
+        self.A_D = theta[24]
+        self.v_avg = theta[25]
+        self.theta_bridge = np.deg2rad(117)
 
     def szmodel(self, 
                 frequency, 
@@ -105,38 +85,28 @@ class Filament():
         
         sz_signal = numerator / bandpass_int
 
-        if self.fit_dust == 'true':    
-            freq_ref = 545 
-            T_D = 20 
-            beta_D = 1.5
+        freq_ref = 545 
+        T_D = 20 
+        beta_D = 1.5
+    
+        x_dust = (const_h * freq_array) * (1 + z) / (const_k_B * T_D)     
+        x_ref = (const_h * freq_ref) / (const_k_B * T_D)
         
-            x_dust = (const_h * freq_array) * (1 + z) / (const_k_B * T_D)     
-            x_ref = (const_h * freq_ref) / (const_k_B * T_D)
-            
-            term_ref = (np.exp(x_ref) - 1)
-            term_dust = (np.exp(x_dust) - 1)
-            
-            term_power = (freq_array * (1+z) / freq_ref)**(beta_D + 3)
-
-            I_dust = self.A_D * term_power * (term_ref / term_dust) 
-            
-            numerator_dust = np.trapz(y=bandpass * I_dust,
-                                        x=freq_array, dx=del_freq)
-            
-            dust_signal = numerator_dust / bandpass_int
-
-            # Total model   
-
-            dust_signal *= bridge_shape
-
-            total_model = (bridge_shape * sz_signal) + dust_signal
-
+        term_ref = (np.exp(x_ref) - 1)
+        term_dust = (np.exp(x_dust) - 1)
         
-        elif self.fit_dust == 'false':
-            total_model = bridge_shape * sz_signal
+        term_power = (freq_array * (1+z) / freq_ref)**(beta_D + 3)
 
-        else:
-            raise ValueError(f"fit_dust must be 'true' or 'false'")
+        I_dust = self.A_D * term_power * (term_ref / term_dust) 
+        
+        numerator_dust = np.trapz(y=bandpass * I_dust,
+                                    x=freq_array, dx=del_freq)
+        
+        dust_signal = numerator_dust / bandpass_int
+
+        dust_signal *= bridge_shape
+
+        total_model = (bridge_shape * sz_signal) + dust_signal
 
         return total_model
 
@@ -157,8 +127,7 @@ class Cluster():
               array,
               xgrid, 
               ygrid,
-              muo,
-              temp_model_type):
+              muo):
         
         # Setup SZpack parameters class
         SZ_params = SZ.parameters()
@@ -207,55 +176,38 @@ class Cluster():
         # Electron density projected map
         beta_density_map_2d = (1 + (r / rc_pix)**2.)**(-1.5*self.beta + 0.5)
 
-        # Interpolation function of SZ signal
+        SZ_params.Te = self.T_e
 
-        if temp_model_type == 'isothermal':
+        I = SZ.compute_combo(SZ_params, DI=True) * 10**6. # Jy/sr
+
+        numerator = np.trapz(y=bandpass * np.array(I),
+                                x=freq_array, dx=del_freq)
+
+        sz_signal = numerator / (bandpass_int) # SZ model
             
-            SZ_params.Te = self.T_e
-
-            I = SZ.compute_combo(SZ_params, DI=True) * 10**6. # Jy/sr
-
-            numerator = np.trapz(y=bandpass * np.array(I),
-                                 x=freq_array, dx=del_freq)
-
-            sz_signal = numerator / (bandpass_int) # SZ model
-            
-        else:
-            raise ValueError(f"temp_model_type must be 'isothermal', or 'vikhilin'")
-
         # Dust emission treatment    
-        if self.fit_dust == 'true':    
-            freq_ref = 545 
-            T_D = 20 
-            beta_D = 1.5
+        freq_ref = 545 
+        T_D = 20 
+        beta_D = 1.5
+    
+        x_dust = (const_h * freq_array) * (1 + z) / (const_k_B * T_D)     
+        x_ref = (const_h * freq_ref) / (const_k_B * T_D)
         
-            x_dust = (const_h * freq_array) * (1 + z) / (const_k_B * T_D)     
-            x_ref = (const_h * freq_ref) / (const_k_B * T_D)
-            
-            term_ref = (np.exp(x_ref) - 1)
-            term_dust = (np.exp(x_dust) - 1)
-            
-            term_power = (freq_array * (1+z) / freq_ref)**(beta_D + 3)
-
-            I_dust = self.A_D * term_power * (term_ref / term_dust) 
-            
-            numerator_dust = np.trapz(y=bandpass * I_dust,
-                                        x=freq_array, dx=del_freq)
-            
-            dust_signal = numerator_dust / bandpass_int
-
-            # Total model   
-
-            dust_signal *= beta_density_map_2d
-
-            total_model = (beta_density_map_2d * sz_signal) + dust_signal
+        term_ref = (np.exp(x_ref) - 1)
+        term_dust = (np.exp(x_dust) - 1)
         
-        elif self.fit_dust == 'false':
-            total_model = beta_density_map_2d * sz_signal
+        term_power = (freq_array * (1+z) / freq_ref)**(beta_D + 3)
 
-        else:
-            raise ValueError(f"fit_dust must be 'true' or 'false'")
+        I_dust = self.A_D * term_power * (term_ref / term_dust) 
+        
+        numerator_dust = np.trapz(y=bandpass * I_dust,
+                                    x=freq_array, dx=del_freq)
+        
+        dust_signal = numerator_dust / bandpass_int
+        dust_signal *= beta_density_map_2d
 
+        total_model = (beta_density_map_2d * sz_signal) + dust_signal
+        
         return total_model
 
     def initialize(self, theta):

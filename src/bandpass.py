@@ -1,29 +1,24 @@
-import numpy as np
-import sys
 import os
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["DIRE_BASE"] = "/home/gill/research/ACT/bridge/a399_a401"
+
+import numpy as np
 import warnings
 from astropy import constants as const, units as u
 
-os.environ["OMP_NUM_THREADS"] = "1"
-
 warnings.filterwarnings('ignore')
 
-dir_ajay_local = "/home/gill/research/ACT/"
-# dir_yilun_local = "/home/yilun/Research/ACT/" # Yilun's local path
-# dir_scinet = 
-# dir_CITA = 
-
-dire_base = dir_ajay_local
+dire_base = os.environ["DIRE_BASE"]
 
 def freq_to_x(frequency):
     frequency *= u.GHz
     return (const.h * frequency.to(u.s**-1) / (const.k_B * 2.725 * u.K)).value
 
 def load_passband_frequency(fname, dire_base):
-    return np.load(f"{dire_base}passbands/{fname}")
+    return np.load(f"{dire_base}/passbands/{fname}")
 
 def load_passband_transmission(fname, dire_base):
-    return np.load(f"{dire_base}passbands/{fname}")
+    return np.load(f"{dire_base}/passbands/{fname}")
 
 def integrate_passband(bandpass, freq_arr):
     del_freq = ((np.max(freq_arr) - np.min(freq_arr))  / len(freq_arr))

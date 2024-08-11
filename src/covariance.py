@@ -1,15 +1,13 @@
-import numpy as np
-from pixell import enmap, reproject
-import sys
-from glob import glob
 import os
+os.environ["OMP_NUM_THREADS"] = "1"
+
+import numpy as np
+from pixell import enmap
+from glob import glob
 import warnings
 from scipy.ndimage import gaussian_filter
 
 import utils as ut
-
-os.environ["OMP_NUM_THREADS"] = "1"
-# sys.path.insert(0, '/home/a/ahincks/gillajay/szpack.v2.0/python')
 
 warnings.filterwarnings('ignore')
 
@@ -209,37 +207,27 @@ def get_covariance(freq1,
     mean_npsd = np.mean(all_regions_npsd, axis=0)
     mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
 
-    print("Mean npsd", mean_npsd)
-    print("Mean spsd", mean_spsd)
-
     if cf['rad_avg_noise']:
-        print("Radial averaging noise")
         mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
         real_rad_npsd_cluster = ut.rad_avg_2d(image=np.real(mean_npsd), bsize=cf['rad_avg_bsize'])
         imag_rad_npsd_cluster = ut.rad_avg_2d(image=np.imag(mean_npsd), bsize=cf['rad_avg_bsize'])
         mean_npsd = real_rad_npsd_cluster + 1.j*imag_rad_npsd_cluster
 
     if cf['rad_avg_signal']:
-        print("Radial averaging signal")
         mean_spsd = enmap.ndmap(np.array(mean_spsd), wcs=data_wcs)
         real_rad_spsd_cluster = ut.rad_avg_2d(image=np.real(mean_spsd), bsize=cf['rad_avg_bsize'])
         imag_rad_spsd_cluster = ut.rad_avg_2d(image=np.imag(mean_spsd), bsize=cf['rad_avg_bsize'])
         mean_spsd = real_rad_spsd_cluster + 1.j*imag_rad_spsd_cluster
 
     if cf['smooth_noise']:
-        print("Smoothing noise")
         mean_npsd = gaussian_filter(input=mean_npsd, sigma=cf['smooth_noise_pix'])
 
     if cf['smooth_signal']:
-        print("Smoothing signal")
         mean_spsd = gaussian_filter(input=mean_spsd, sigma=cf['smooth_signal_pix'])
     
     mean_tpsd_cluster = mean_spsd + mean_npsd
 
-    print("Mean tpsd", mean_tpsd_cluster)
-
     if cf['rad_avg_total']:
-        print("Radial averaging total")
         mean_tpsd_cluster = enmap.ndmap(np.array(mean_tpsd_cluster), wcs=data_wcs)
         real_rad_tpsd_cluster = ut.rad_avg_2d(image=np.real(mean_tpsd_cluster), 
                                               bsize=cf['rad_avg_bsize'])
@@ -248,7 +236,6 @@ def get_covariance(freq1,
         mean_tpsd_cluster = real_rad_tpsd_cluster + 1.j*imag_rad_tpsd_cluster
 
     if cf['smooth_total']:
-        print("Smoothing total")
         mean_tpsd_cluster = gaussian_filter(input=mean_tpsd_cluster, sigma=cf['smooth_total_pix'])
     
     mean_tpsd_cluster = enmap.ndmap(np.array(mean_tpsd_cluster), wcs=data_wcs)

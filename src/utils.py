@@ -6,7 +6,6 @@ from pixell import enmap, uharm
 import warnings
 import glob
 import numpy as np
-import sys
 import yaml
 import pickle
 
@@ -82,25 +81,6 @@ def load_combos():
             '545_npipe_planck',
             '857_npipe_planck']
     return combos
-
-def load_interp_funcs():
-    """
-    Load interpolation functions for the SZ signal from disk
-    """
-    path = f"{dire_base}stack"
-    combos = load_combos()
-    func_dict = {}
-
-    for combo in combos:
-        split = combo.split('_')
-        freq = split[0]
-        array = split[1]
-
-        with open(f"{path}/func_{freq}_{array}.pkl", 'rb') as file:
-            inter_func = pickle.load(file)
-            func_dict[f"{freq}_{array}"] = inter_func
-    
-    return func_dict
 
 @njit
 def r_grid(xgrid, ygrid, ra_pix, dec_pix, theta_cluster, e):
@@ -425,13 +405,13 @@ def get_2d_beam(data_shape, freq, array, inst, data_wcs, version="dr6v2"):
     if inst == 'act':
         
         if version == "dr6v3":
-            beam_dir = f"{dire_base}beams/20220817_beams/"
+            beam_dir = f"{dire_base}/beams/20220817_beams/"
         
         elif version == "dr6v2":
-            beam_dir = f"{dire_base}beams/20210913_beams/"
+            beam_dir = f"{dire_base}/beams/20210913_beams/"
         
         elif version == "dr6v4":
-            beam_dir = f"{dire_base}beams/20230130_beams/"
+            beam_dir = f"{dire_base}/beams/20230130_beams/"
         
         file = glob.glob(beam_dir+"*coadd*"+array+"*" +
                          str(freq)+"*tform_jitter_cmb.txt")

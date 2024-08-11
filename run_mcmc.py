@@ -1,3 +1,8 @@
+import os
+os.environ["DIRE_BASE"] = "/home/gill/research/ACT/bridge/a399_a401"
+os.environ["ACT_DATADIR"] = "/home/gill/research/ACT/bridge/a399_a401/data/act"
+os.environ["PLANCK_DATADIR"] = "/home/gill/research/ACT/bridge/a399_a401/data/planck"
+
 from numba import jit
 from schwimmbad import MPIPool
 #from multiprocessing import Pool
@@ -7,7 +12,6 @@ import emcee
 import itertools
 import pathlib
 import glob
-import os
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -181,16 +185,14 @@ def lnlike(theta):
                               z=cf['c1_z'],
                               muo=cf['c1_muo'],
                               xgrid=xgrid, 
-                              ygrid=ygrid,
-                              temp_model_type=cf['temp_model_type'])
+                              ygrid=ygrid)
         
         c2_model = c2.szmodel(frequency=freq,
                                 array=array,
                                 z=cf['c2_z'],
                                 muo=cf['c2_muo'],
                                 xgrid=xgrid,
-                                ygrid=ygrid,
-                                temp_model_type=cf['temp_model_type'])
+                                ygrid=ygrid)
         
         fil_model = fil.szmodel(frequency=freq,
                                 array=array,
@@ -218,7 +220,6 @@ def lnprob(theta):
     return lp + lnlike(theta=theta)    
 
 def main():
-    global cf
     global data_list_array
     global beam_list_array
     global icov
@@ -243,13 +244,15 @@ def main():
     global c1_r500_pix, c2_r500_pix
 
     global cf
-    global interp_f_dict
 
-    config_data_fname = str(sys.argv[1])
+    config_data_fname = f"{os.environ['MPLCONFIGDIR']}config_mcmc.yaml"
     
-    cf = ut.get_config_file(config_data_fname)
+    try:
+        cf = ut.get_config_file(config_data_fname)
+    except FileNotFoundError:
+        print(f"Config file not found: {config_data_fname}")
 
-    dir_head = pathlib.Path(cf['planck_data_dir']).parent.as_posix()
+    dir_base = os.environ["DIRE_BASE"]
     
     cluster_region = ut.get_region(region_center_ra=cf['region_center_ra'], 
                                    region_center_dec=cf['region_center_dec'],
@@ -257,6 +260,7 @@ def main():
 
     data_list, beam_list, data_wcs_list = [], [], []
 
+    print("Appending data.")
     for _, data in enumerate(cf['data']):
         freq = data.split('_')[0]
         array = data.split('_')[1]
@@ -265,7 +269,7 @@ def main():
 
         if inst == 'act':
             if scan == 'dr6v2':
-                data_dir = cf['act_data_dir_dr6v2']
+                data_dir = cf['act_data_dir']
             elif scan == 'dr6v4':
                 data_dir = cf['act_data_dir_dr6v4']
             else: 
@@ -286,7 +290,7 @@ def main():
         else:
             raise ValueError("Undefined system type.")
 
-        str_data = f"{data_dir}*{array}*{freq}*coadd*map{data_str_flag}.fits"
+        str_data = f"{data_dir}/*{array}*{freq}*coadd*map{data_str_flag}.fits"
 
         data_coadd = np.sort(glob.glob(str_data))[0]
         data_coadd = ut.imap_dim_check(enmap.read_map(data_coadd, box=cluster_region))
@@ -315,13 +319,13 @@ def main():
     mean_apod_mask = np.mean(apod_mask)
 
     # Covariance appender
+    print("Appending covariance.")
     combos = []
     for combo in itertools.product(cf['data'], cf['data']):
         combos.append(combo)
 
     covar_list = []
     
-    #print("Fetching covariance.")
     for _, combo in enumerate(combos):
         # print(f"Combo: {combo}")
         freq1 = combo[0].split('_')[0]
@@ -334,7 +338,7 @@ def main():
         inst2 = combo[1].split('_')[2]
         scan2 = combo[1].split('_')[3]
 
-        tpsd = np.load(f"{dir_head}/cov/cov_{freq1}_{array1}_{inst1}_{scan1}_{freq2}_{array2}_{inst2}_{scan2}.npy")
+        tpsd = np.load(f"{dir_base}/cov/cov_{freq1}_{array1}_{inst1}_{scan1}_{freq2}_{array2}_{inst2}_{scan2}.npy")
         
         covar_list.append(tpsd.ravel())
 
@@ -378,31 +382,30 @@ def main():
     fil_w0_min_pix = cf['fil_w0_min_arcmin'] / 0.5  # arcmin/pix
     fil_w0_max_pix = cf['fil_w0_max_arcmin'] / 0.5  # arcmin/pix 
 
-    # Load interpolated function dictionary
-    interp_f_dict = ut.load_interp_funcs()
+    mcmc_filepath = f"{dir_base}/{cf['mcmc_filename']}"
 
-    cf_file_name = cf['mcmc_filename']
-    cf_file_path = f"{dir_head}/{cf_file_name}"
+    print("MCMC file path: ", mcmc_filepath)
 
-    repeat_h5 = cf['repeat_h5']
-
-    if os.path.exists(cf_file_path) and repeat_h5 == 'true':
+    if os.path.exists(mcmc_filepath) and cf['repeat_h5'] == 'true':
         print("MCMC file exists.")
         init_params = None
     else:
         init_params = get_initial_params(cf=cf, n_walkers=cf['n_walkers'])
     
     n_dim = get_initial_params(cf=cf, n_walkers=cf['n_walkers']).shape[1]
-    backend = emcee.backends.HDFBackend(cf['mcmc_filename'])
+    backend = emcee.backends.HDFBackend(mcmc_filepath)
     
+    print("Running MCMC.")
     with MPIPool() as pool:
         if not pool.is_master():
             pool.wait()
             sys.exit(0)
         
-        sampler = emcee.EnsembleSampler(nwalkers=cf['n_walkers'], ndim=n_dim, 
+        sampler = emcee.EnsembleSampler(nwalkers=cf['n_walkers'], 
+                                        ndim=n_dim, 
                                         log_prob_fn=lnprob, 
-                                        pool=pool, backend=backend)
+                                        pool=pool, 
+                                        backend=backend)
         
         sampler.run_mcmc(initial_state=init_params, nsteps=cf['n_iter'], progress=True)
 
