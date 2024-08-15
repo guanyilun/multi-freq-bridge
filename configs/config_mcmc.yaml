@@ -2,8 +2,7 @@
 #region_center_dec: 13.2999979
 region_center_ra: 0
 region_center_dec: 0
-region_width:
-  2.25
+region_width: 2.25
 
   #c1_ra: 44.751
   #c1_dec: 13.572
@@ -67,8 +66,7 @@ c2_Te_max: 15
 c2_Dtau_min: 0
 c2_Dtau_max: 0.02
 c2_A_D_min: 0
-c2_A_D_max:
-  1000000
+c2_A_D_max: 1000000
 
   #fil_ra: 44.68
   #fil_dec: 13.37
@@ -100,8 +98,8 @@ fil_Te_max: 15
 fil_Te_mean: 6.52
 fil_Te_std: 0.35
 
-v_avg_min: -1000
-v_avg_max: 1000
+v_avg_min: -10000
+v_avg_max: 10000
 v_delta_min: -15000
 v_delta_max: 15000
 
@@ -130,7 +128,7 @@ temp_model_type: isothermal
 repeat_h5: "true"
 
 data:
-  #- 150_pa4_act_dr6v2
+  - 150_pa4_act_dr6v2
   - 220_pa4_act_dr6v2
   - 150_pa5_act_dr6v2
   - 98_pa5_act_dr6v2
@@ -142,12 +140,12 @@ data:
     #- 98_pa5_act_dr6v4
     #- 98_pa6_act_dr6v4
     #- 150_pa6_act_dr6v4
-    #- 30_npipe_planck_sky
-    #- 44_npipe_planck_sky
-    #- 70_npipe_planck_sky
+  - 30_npipe_planck_sky
+  - 44_npipe_planck_sky
+  - 70_npipe_planck_sky
   - 100_npipe_planck_sky
   - 143_npipe_planck_sky
   - 217_npipe_planck_sky
   - 353_npipe_planck_sky
-    #- 545_npipe_planck_sky
+  - 545_npipe_planck_sky
     #- 857_npipe_planck_sky
