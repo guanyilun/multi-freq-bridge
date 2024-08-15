@@ -2,7 +2,8 @@
 #region_center_dec: 13.2999979
 region_center_ra: 0
 region_center_dec: 0
-region_width: 2.25
+region_width:
+  2.25
 
   #c1_ra: 44.751
   #c1_dec: 13.572
@@ -33,7 +34,8 @@ c1_Te_max: 15
 c1_Dtau_min: 0
 c1_Dtau_max: 0.02
 c1_A_D_min: 0
-c1_A_D_max: 1000000
+c1_A_D_max:
+  1000000
 
   #c2_ra: 44.473
   #c2_dec: 13.03
@@ -66,7 +68,8 @@ c2_Te_max: 15
 c2_Dtau_min: 0
 c2_Dtau_max: 0.02
 c2_A_D_min: 0
-c2_A_D_max: 1000000
+c2_A_D_max:
+  1000000
 
   #fil_ra: 44.68
   #fil_dec: 13.37
@@ -93,8 +96,8 @@ fil_Dtau_max: 0.007
 
 fil_A_D_min: 0
 fil_A_D_max: 1000000
-fil_Te_min: 1
-fil_Te_max: 15
+fil_Te_min: 4
+fil_Te_max: 8
 fil_Te_mean: 6.52
 fil_Te_std: 0.35
 
