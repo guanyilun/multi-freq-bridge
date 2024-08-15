@@ -88,9 +88,9 @@ fil_ra_max: 0.18832559999999887
 fil_dec_min: -0.09999789999999997
 fil_dec_max: 0.17000210000000138
 fil_l0_min_arcmin: 0
-fil_l0_max_arcmin: 30
+fil_l0_max_arcmin: 20
 fil_w0_min_arcmin: 0
-fil_w0_max_arcmin: 30
+fil_w0_max_arcmin: 20
 fil_Dtau_min: 0
 fil_Dtau_max: 0.007
 
