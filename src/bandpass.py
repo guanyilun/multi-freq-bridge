@@ -1,7 +1,4 @@
 import os
-os.environ["OMP_NUM_THREADS"] = "1"
-os.environ["DIRE_BASE"] = "/home/gill/research/ACT/bridge/a399_a401"
-
 import numpy as np
 import warnings
 from astropy import constants as const, units as u

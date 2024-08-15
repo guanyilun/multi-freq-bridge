@@ -1,13 +1,10 @@
 import os 
-os.environ['MPLCONFIGDIR'] = os.getcwd() + "/configs/"
-
 import matplotlib.pyplot as plt
 from pixell import enmap, uharm
 import warnings
 import glob
 import numpy as np
 import yaml
-import pickle
 
 from numba import njit, jit
 

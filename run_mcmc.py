@@ -1,7 +1,5 @@
-import os
-os.environ["DIRE_BASE"] = "/home/gill/research/ACT/bridge/a399_a401"
-os.environ["ACT_DATADIR"] = "/home/gill/research/ACT/bridge/a399_a401/data/act"
-os.environ["PLANCK_DATADIR"] = "/home/gill/research/ACT/bridge/a399_a401/data/planck"
+from dotenv import load_dotenv
+load_dotenv()
 
 from numba import jit
 from schwimmbad import MPIPool
