@@ -19,10 +19,10 @@ region_width:
 
 c1_ra: 0.1593255999999954
 c1_dec: 0.2720020999999999
-c1_ra_min: 0.03
-c1_ra_max: 0.27
-c1_dec_min: 0.17
-c1_dec_max: 0.4
+c1_ra_min: 0.133
+c1_ra_max: 0.150
+c1_dec_min: 0.265
+c1_dec_max: 0.283
 
 c1_muo: -0.5566122489553409
 c1_beta_min: 0.1
@@ -32,7 +32,7 @@ c1_rc_arcmin_max: 8.5
 c1_R_min: 0.2
 c1_R_max: 5.0
 c1_theta_min: 70
-c1_theta_max: 130.0
+c1_theta_max: 180.
 c1_Te_mean: 8.47
 c1_Te_std: 0.25
 c1_mass: 10.2
@@ -61,10 +61,10 @@ c1_A_D_max:
 
 c2_ra: -0.11867440000000329
 c2_dec: -0.2699978999999999
-c2_ra_min: 359.81
-c2_ra_max: 359.942
-c2_dec_min: -0.312
-c2_dec_max: -0.21
+c2_ra_min: 359.88
+c2_ra_max: 359.892
+c2_dec_min: -0.275
+c2_dec_max: -0.26
 c2_muo: -0.5606024845891494
 c2_beta_min: 0.1
 c2_beta_max: 3.5
