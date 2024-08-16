@@ -3,7 +3,7 @@ load_dotenv()
 
 import os
 
-dir_base = os.getenv["DIRE_BASE"]
+dir_base = os.getenv("DIRE_BASE")
 
 # General modules
 from numba import jit
