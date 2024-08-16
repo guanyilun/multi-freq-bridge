@@ -5,7 +5,7 @@ from astropy import constants as const, units as u
 
 warnings.filterwarnings('ignore')
 
-dire_base = os.environ["DIRE_BASE"]
+dire_base = os.getenv["DIRE_BASE"]
 
 def freq_to_x(frequency):
     frequency *= u.GHz

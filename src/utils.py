@@ -17,7 +17,27 @@ import bandpass as bp
 plt.rcParams.update({'font.size': 18})
 warnings.filterwarnings('ignore')
 
-dire_base = os.environ["DIRE_BASE"]
+dire_base = os.getenv["DIRE_BASE"]
+
+# Absolute photometric calibration factors
+cal_dict = {'dr6_pa4_f150': {'multipole_range': [1250, 1800],
+  'ref_array': 'Planck_f143',
+  'calibs': [1.0072175262677963, 0.0023154207035651023]},
+ 'dr6_pa4_f220': {'multipole_range': [1500, 2000],
+  'ref_array': 'Planck_f217',
+  'calibs': [1.0340185610989223, 0.01626333139583416]},
+ 'dr6_pa5_f098': {'multipole_range': [800, 1100],
+  'ref_array': 'Planck_f100',
+  'calibs': [1.0218836321586204, 0.0011691303344386838]},
+ 'dr6_pa5_f150': {'multipole_range': [1250, 1800],
+  'ref_array': 'Planck_f143',
+  'calibs': [0.9876564792184743, 0.001704546067935355]},
+ 'dr6_pa6_f098': {'multipole_range': [800, 1100],
+  'ref_array': 'Planck_f100',
+  'calibs': [1.0181628559678786, 0.0013096342890986763]},
+ 'dr6_pa6_f150': {'multipole_range': [1250, 1800],
+  'ref_array': 'Planck_f143',
+  'calibs': [0.9699498005405339, 0.002141045797557799]}}
 
 def coord_from_ref(ref_ra, ref_dec, des_ra, des_dec, delta):
     """

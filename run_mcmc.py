@@ -1,6 +1,11 @@
 from dotenv import load_dotenv
 load_dotenv()
 
+import os
+
+dir_base = os.getenv["DIRE_BASE"]
+
+# General modules
 from numba import jit
 from schwimmbad import MPIPool
 #from multiprocessing import Pool
@@ -8,14 +13,13 @@ import numpy as np
 from pixell import enmap
 import emcee
 import itertools
-import pathlib
 import glob
+import sys
 import warnings
 warnings.filterwarnings('ignore')
 
-import sys
+# Custom modules
 sys.path.insert(0, "src")
-
 import utils as ut
 import model
 
@@ -243,14 +247,12 @@ def main():
 
     global cf
 
-    config_data_fname = f"{os.environ['MPLCONFIGDIR']}config_mcmc.yaml"
+    config_data_fname = f"configs/config_mcmc.yaml"
     
     try:
         cf = ut.get_config_file(config_data_fname)
     except FileNotFoundError:
         print(f"Config file not found: {config_data_fname}")
-
-    dir_base = os.environ["DIRE_BASE"]
     
     cluster_region = ut.get_region(region_center_ra=cf['region_center_ra'], 
                                    region_center_dec=cf['region_center_dec'],
