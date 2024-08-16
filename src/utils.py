@@ -17,7 +17,7 @@ import bandpass as bp
 plt.rcParams.update({'font.size': 18})
 warnings.filterwarnings('ignore')
 
-dire_base = os.getenv["DIRE_BASE"]
+dire_base = os.getenv("DIRE_BASE")
 
 # Absolute photometric calibration factors
 cal_dict = {'dr6_pa4_f150': {'multipole_range': [1250, 1800],

@@ -69,12 +69,12 @@ def get_covariance(freq1,
     ivars1 = np.sort(glob(ivars1_str))
     ivars2 = np.sort(glob(ivars2_str))
     
-    # Find the shape of the central region (that we will fit)
-    try:
-        shape_x = enmap.read_map(coadd1[0], box=regions[-1]).shape[0]
-        shape_y = enmap.read_map(coadd1[0], box=regions[-1]).shape[1]
-    except:
-        raise ValueError("Could not cental coadd read map.")
+    # # Find the shape of the central region (that we will fit)
+    # try:
+    #     shape_x = enmap.read_map(coadd1[0], box=regions[-1]).shape[0]
+    #     shape_y = enmap.read_map(coadd1[0], box=regions[-1]).shape[1]
+    # except:
+    #     raise ValueError("Could not cental coadd read map.")
 
     # We want the coadd maps to be in Jy/sr
     # We want the ivar maps to be in 1 / (Jy/sr)^2
@@ -87,22 +87,22 @@ def get_covariance(freq1,
     all_regions_npsd, all_regions_spsd = [], []
 
     # Loop over all regions (now regular noise and signal cov calculations)
-    for idx, region in enumerate(regions):
+    for _, region in enumerate(regions):
 
-        coadd1_map = ut.imap_dim_check(enmap.read_map(coadd1[0], box=region)[0:shape_x, 0:shape_y]) * flux_factor1
-        coadd2_map = ut.imap_dim_check(enmap.read_map(coadd2[0], box=region)[0:shape_x, 0:shape_y]) * flux_factor2
+        coadd1_map = ut.imap_dim_check(enmap.read_map(coadd1[0], box=region)) * flux_factor1
+        coadd2_map = ut.imap_dim_check(enmap.read_map(coadd2[0], box=region)) * flux_factor2
 
-        #print("Coadd 1 shape, region idx: ", coadd1_map.shape, idx)
-        #print("Coadd 2 shape, region idx: ", coadd2_map.shape, idx)
+        # print("Coadd 1 shape, region idx: ", coadd1_map.shape, idx)
+        # print("Coadd 2 shape, region idx: ", coadd2_map.shape, idx)
 
         ivars1_list, ivars2_list = [], []
         
         for j in range(len(ivars1)):
-            ivar_map1 = ut.imap_dim_check(enmap.read_map(ivars1[j], box=region)[0:shape_x, 0:shape_y]) / flux_factor1**2
+            ivar_map1 = ut.imap_dim_check(enmap.read_map(ivars1[j], box=region)) / flux_factor1**2
             ivars1_list.append(ivar_map1)
 
         for j in range(len(ivars2)):
-            ivar_map2 = ut.imap_dim_check(enmap.read_map(ivars2[j], box=region)[0:shape_x, 0:shape_y]) / flux_factor2**2
+            ivar_map2 = ut.imap_dim_check(enmap.read_map(ivars2[j], box=region)) / flux_factor2**2
             ivars2_list.append(ivar_map2)
 
         sum_ivar1 = np.sum(ivars1_list, axis=0)
@@ -133,14 +133,14 @@ def get_covariance(freq1,
         if noise_type_bool:
             for idx_split in range(max_split_number):
                 
-                split1 = ut.imap_dim_check(enmap.read_map(splits1[idx_split], box=region)[0:shape_x, 0:shape_y]) * flux_factor1
-                split2 = ut.imap_dim_check(enmap.read_map(splits2[idx_split], box=region)[0:shape_x, 0:shape_y]) * flux_factor2
+                split1 = ut.imap_dim_check(enmap.read_map(splits1[idx_split], box=region)) * flux_factor1
+                split2 = ut.imap_dim_check(enmap.read_map(splits2[idx_split], box=region)) * flux_factor2
 
                 #print("Split 1 shape, region idx: ", split1.shape, idx)
                 #print("Split 2 shape, region idx: ", split2.shape, idx)
 
-                ivar1 = ut.imap_dim_check(enmap.read_map(ivars1[idx_split], box=region)[0:shape_x, 0:shape_y]) / flux_factor1**2
-                ivar2 = ut.imap_dim_check(enmap.read_map(ivars2[idx_split], box=region)[0:shape_x, 0:shape_y]) / flux_factor2**2
+                ivar1 = ut.imap_dim_check(enmap.read_map(ivars1[idx_split], box=region)) / flux_factor1**2
+                ivar2 = ut.imap_dim_check(enmap.read_map(ivars2[idx_split], box=region)) / flux_factor2**2
 
                 #print("Ivar 1 shape, region idx: ", ivar1.shape, idx)
                 #print("Ivar 2 shape, region idx: ", ivar2.shape, idx)
@@ -167,8 +167,6 @@ def get_covariance(freq1,
 
                 npsd_region = diff1_fft * np.conjugate(diff2_fft) / weight
 
-                npsd_region = npsd_region[0:shape_x, 0:shape_y]
-
                 noise_all_splits_loop.append(npsd_region)
 
             npsd = (1/(max_split_number*(max_split_number-1))) * np.sum(noise_all_splits_loop, axis=0)
@@ -189,8 +187,6 @@ def get_covariance(freq1,
         coadd2_map_norm = np.fft.fft2(coadd2_map_apod) 
 
         spsd = coadd1_map_norm * np.conjugate(coadd2_map_norm) / np.mean(apod_mask1 * apod_mask2)
-
-        spsd = spsd[0:shape_x, 0:shape_y]
 
         # Subtract the noise covariance from the signal cov from each region
         if (noise_type_bool): 
