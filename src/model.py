@@ -66,7 +66,7 @@ class Filament():
 
         SZ_params.Te = self.Te
 
-                # Bridge implementation
+        # Bridge implementation
         w = ( (xgrid - self.ra_pix)*np.sin(self.theta_bridge) 
             + (ygrid - self.dec_pix)*np.cos(self.theta_bridge) )
         

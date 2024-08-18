@@ -1,9 +1,6 @@
 region_center_ra: 44.5916744
 region_center_dec: 13.2999979
 
-#region_center_ra: 0
-#region_center_dec: 0
-
 region_width: 2.25 # degrees
 
 # Cluster 1
@@ -13,21 +10,6 @@ c1_ra_min: 44.651
 c1_ra_max: 44.851
 c1_dec_min: 13.472
 c1_dec_max: 13.672
-
-# c1_ra: 0.1593255999999954
-# c1_dec: 0.2720020999999999
-# c1_ra_min: 0.05932560000000109
-# c1_ra_max: 0.2593255999999968
-
-# c1_dec_min: 0.17200210000000027
-# c1_dec_max: 0.37200210000000133
-
-# c1_ra: 0.1593255999999954
-# c1_dec: 0.2720020999999999
-# c1_ra_min: 0.133
-# c1_ra_max: 0.150
-# c1_dec_min: 0.265
-# c1_dec_max: 0.283
 
 c1_muo: -0.5566122489553409
 c1_beta_min: 0.1
@@ -56,13 +38,6 @@ c2_ra_min: 44.373
 c2_ra_max: 44.573
 c2_dec_min: 12.93
 c2_dec_max: 13.13
-
-# c2_ra: -0.11867440000000329
-# c2_dec: -0.2699978999999999
-# c2_ra_min: -0.2186744000000047
-# c2_ra_max: -0.018674400000001867
-# c2_dec_min: -0.36999789999999955
-# c2_dec_max: -0.16999789999999848
 
 c2_muo: -0.5606024845891494
 c2_beta_min: 0.1
@@ -93,15 +68,8 @@ fil_ra_max: 44.78
 fil_dec_min: 13.2
 fil_dec_max: 13.47
 
-# fil_ra: 0.08832559999999745
-# fil_dec: 0.07000209999999996
-
 fil_muo: -0.5576451231598584
 fil_z: 0.072735
-fil_ra_min: -0.01167440000000397
-fil_ra_max: 0.18832559999999887
-fil_dec_min: -0.09999789999999997
-fil_dec_max: 0.17000210000000138
 
 fil_l0_min_arcmin: 0
 fil_l0_max_arcmin: 35
