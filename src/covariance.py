@@ -3,6 +3,7 @@ from pixell import enmap
 from glob import glob
 import warnings
 from scipy.ndimage import gaussian_filter
+from scipy.optimize import curve_fit
 
 import utils as ut
 
@@ -69,13 +70,6 @@ def get_covariance(freq1,
     ivars1 = np.sort(glob(ivars1_str))
     ivars2 = np.sort(glob(ivars2_str))
     
-    # # Find the shape of the central region (that we will fit)
-    # try:
-    #     shape_x = enmap.read_map(coadd1[0], box=regions[-1]).shape[0]
-    #     shape_y = enmap.read_map(coadd1[0], box=regions[-1]).shape[1]
-    # except:
-    #     raise ValueError("Could not cental coadd read map.")
-
     # We want the coadd maps to be in Jy/sr
     # We want the ivar maps to be in 1 / (Jy/sr)^2
     flux_factor1 = ut.flux_factor(array1, freq1) # Jy/uK/sr
@@ -91,9 +85,6 @@ def get_covariance(freq1,
 
         coadd1_map = ut.imap_dim_check(enmap.read_map(coadd1[0], box=region)) * flux_factor1
         coadd2_map = ut.imap_dim_check(enmap.read_map(coadd2[0], box=region)) * flux_factor2
-
-        # print("Coadd 1 shape, region idx: ", coadd1_map.shape, idx)
-        # print("Coadd 2 shape, region idx: ", coadd2_map.shape, idx)
 
         ivars1_list, ivars2_list = [], []
         
@@ -136,14 +127,8 @@ def get_covariance(freq1,
                 split1 = ut.imap_dim_check(enmap.read_map(splits1[idx_split], box=region)) * flux_factor1
                 split2 = ut.imap_dim_check(enmap.read_map(splits2[idx_split], box=region)) * flux_factor2
 
-                #print("Split 1 shape, region idx: ", split1.shape, idx)
-                #print("Split 2 shape, region idx: ", split2.shape, idx)
-
                 ivar1 = ut.imap_dim_check(enmap.read_map(ivars1[idx_split], box=region)) / flux_factor1**2
                 ivar2 = ut.imap_dim_check(enmap.read_map(ivars2[idx_split], box=region)) / flux_factor2**2
-
-                #print("Ivar 1 shape, region idx: ", ivar1.shape, idx)
-                #print("Ivar 2 shape, region idx: ", ivar2.shape, idx)
 
                 diff1 = split1 - coadd1_map
                 diff2 = split2 - coadd2_map
@@ -197,8 +182,8 @@ def get_covariance(freq1,
     mean_spsd = np.mean(all_regions_spsd[:-1], axis=0)
     mean_spsd = enmap.ndmap(np.array(mean_spsd), wcs=data_wcs)
 
-    #mean_npsd = np.mean(all_regions_npsd, axis=0)
-    mean_npsd = all_regions_npsd[-1] # cluster region
+    mean_npsd = np.mean(all_regions_npsd, axis=0)
+    #mean_npsd = all_regions_npsd[-1] # cluster region
     mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
 
     if cf['rad_avg_noise']:
@@ -234,7 +219,7 @@ def get_covariance(freq1,
     
     mean_tpsd_cluster = enmap.ndmap(np.array(mean_tpsd_cluster), wcs=data_wcs)
     
-    return mean_tpsd_cluster, mean_npsd, mean_spsd
+    return mean_tpsd_cluster, mean_npsd, mean_spsd, all_regions_npsd, all_regions_spsd
 
 def get_covariance_sample(freq1, 
                             freq2, 
@@ -376,17 +361,15 @@ def get_covariance_sample(freq1,
         
         all_regions_spsd.append(enmap.ndmap(np.array(spsd), wcs=data_wcs))
 
+    # Noise covariance over the central region with random shifts
+    # This is to get a better estimate of the noise covariance
     npsd_list = []
 
     if noise_type_bool:
-        iterations = 50
+        iterations = 100
         play_degrees = 0.5
 
         for idx in range(iterations):
-
-            if idx % 25 == 0:
-                print(f"Running iteration {idx} of {iterations}")
-            
             region_center_ra =  cf['region_center_ra'] + np.random.uniform(-play_degrees, play_degrees)
             region_center_dec = cf['region_center_dec'] + np.random.uniform(-play_degrees, play_degrees)
             region_width = cf['region_width']
@@ -453,18 +436,18 @@ def get_covariance_sample(freq1,
             npsd = enmap.ndmap(np.array(npsd), wcs=data_wcs)
             npsd_list.append(npsd)
 
-        else:
-            npsd = np.zeros_like(coadd1_map)
-            npsd_list.append(enmap.ndmap(np.array(npsd), wcs=data_wcs))
+    else:
+        npsd = np.zeros_like(coadd1_map)
+        npsd_list.append(enmap.ndmap(np.array(npsd), wcs=data_wcs))
     
-    mean_npsd_iterators = np.median(npsd_list, axis=0)
+    mean_npsd_iterators = np.mean(npsd_list, axis=0)
     mean_npsd_iterators = enmap.ndmap(np.array(mean_npsd_iterators), wcs=data_wcs)
 
     mean_spsd = np.mean(all_regions_spsd[:-1], axis=0)
     mean_spsd = enmap.ndmap(np.array(mean_spsd), wcs=data_wcs)
 
-    #mean_npsd = np.mean(all_regions_npsd, axis=0)
-    mean_npsd = all_regions_npsd[-1] # cluster region
+    mean_npsd = np.mean(all_regions_npsd, axis=0)
+    #mean_npsd = all_regions_npsd[-1] # cluster region
     mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
 
     if cf['rad_avg_noise']:
@@ -480,11 +463,13 @@ def get_covariance_sample(freq1,
         mean_spsd = real_rad_spsd_cluster + 1.j*imag_rad_spsd_cluster
 
     if cf['smooth_noise']:
-        mean_npsd = gaussian_filter(input=mean_npsd, sigma=cf['smooth_noise_pix'])
+        # mean_npsd = gaussian_filter(input=mean_npsd, sigma=cf['smooth_noise_pix'])
+        mean_npsd_iterators = gaussian_filter(input=mean_npsd_iterators, sigma=cf['smooth_noise_pix'])
 
     if cf['smooth_signal']:
         mean_spsd = gaussian_filter(input=mean_spsd, sigma=cf['smooth_signal_pix'])
     
+    # mean_tpsd_cluster = mean_spsd + mean_npsd
     mean_tpsd_cluster = mean_spsd + mean_npsd_iterators
 
     if cf['rad_avg_total']:
@@ -497,7 +482,61 @@ def get_covariance_sample(freq1,
 
     if cf['smooth_total']:
         mean_tpsd_cluster = gaussian_filter(input=mean_tpsd_cluster, sigma=cf['smooth_total_pix'])
+
+    # Test
+   # mean_tpsd_cluster = np.abs(mean_tpsd_cluster)
     
     mean_tpsd_cluster = enmap.ndmap(np.array(mean_tpsd_cluster), wcs=data_wcs)
     
     return mean_tpsd_cluster, mean_npsd_iterators, mean_spsd
+
+def func(l, l_knee, alpha, white_noise, eps=1e-3):
+    return ( (l_knee / (l+eps) )**-alpha + 1 ) * white_noise**2.
+
+def smoothing(l_npsd, 
+              b_npsd, 
+              twoD_npsd_orig, 
+              gauss_smooth_sigma, 
+              mask_value, geometry):
+    # 1) 2D noise power spectrum in Fourier space (real and imag part): 2d_psd_orig
+    # 2) Make a binned version which in 1D for the abs value (2 arrays, psd, and ell)
+    # 3) Fit a functional form to the array above (3 parameters: alpha, knee, and white noise)
+    # 4) 2D projection of the fitted function form: 2d_psd_fit
+    # 5) 2d_residual = 2d_psd_orig / 2d_psd_fit
+    # 6) 2d_residual_smooth = SMOOTH(2d_residual)
+    # 7) 2d_psd_final = 2d_psd_fit * 2d_residual_smooth
+    
+    # Step 3: Fit a functional form to the array above (3 parameters: alpha, knee, and white noise)
+    x = l_npsd
+    y = b_npsd
+    mask = x >= mask_value
+
+    x_filtered = x[mask]
+    y_filtered = y[mask]
+
+    # Initial guess for parameters
+    # Find the average of values between l = 5000 and l = 10000
+    white_noise = np.mean(y_filtered[(x_filtered > 5000) & (x_filtered < 10000)])
+
+    p0 = [2000, -3, np.sqrt(white_noise)]  # initial guess for l_knee, alpha, white_noise
+
+    # Fit the curve using filtered data
+    params, _ = curve_fit(func, x_filtered, y_filtered, sigma=y_filtered**0.5, p0=p0)
+
+    print("Fitted parameters: ", params)
+
+    # Step 4: 2D projection of the fitted function form: 2d_psd_fit
+    modlmap = enmap.modlmap(*geometry)
+
+    twoD_npsd_fit = func(modlmap, *params)
+
+    # Step 5: 2d_residual = 2d_psd_orig / 2d_psd_fit
+    twoD_residual = twoD_npsd_orig / twoD_npsd_fit
+
+    # Step 6: 2d_residual_smooth = SMOOTH(2d_residual)
+    twoD_residual_smooth = gaussian_filter(input=twoD_residual, sigma=gauss_smooth_sigma)
+
+    # Step 7: 2d_psd_final = 2d_psd_fit * 2d_residual_smooth
+    twoD_npsd_smooth = twoD_npsd_fit * twoD_residual_smooth
+
+    return twoD_npsd_smooth

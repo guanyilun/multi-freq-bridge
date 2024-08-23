@@ -161,8 +161,8 @@ def get_config_file(config_file):
             print(exc)
 
     # add some environment variables to config_data for backward compatibility
-    config_data["act_data_dir"] = os.environ["ACT_DATADIR"]
-    config_data["planck_data_dir"] = os.environ["PLANCK_DATADIR"]
+    # config_data["act_data_dir"] = os.environ["ACT_DATADIR"]
+    # config_data["planck_data_dir"] = os.environ["PLANCK_DATADIR"]
 
     return config_data
 

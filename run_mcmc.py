@@ -3,8 +3,6 @@ load_dotenv()
 
 import os
 
-dir_base = os.getenv("DIRE_BASE")
-
 # General modules
 from numba import jit
 from schwimmbad import MPIPool
@@ -22,6 +20,9 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, "src")
 import utils as ut
 import model
+
+dir_base = os.getenv("DIRE_BASE")
+cov_dir = os.getenv("COV_DIR")
 
 def get_initial_params(cf, n_walkers):
     
@@ -247,7 +248,7 @@ def main():
 
     global cf
 
-    config_data_fname = f"configs/config_mcmc.yaml"
+    config_data_fname = "configs/config_mcmc.yaml"
     
     try:
         cf = ut.get_config_file(config_data_fname)
@@ -269,14 +270,14 @@ def main():
 
         if inst == 'act':
             if scan == 'dr6v2':
-                data_dir = cf['act_data_dir']
+                data_dir = os.getenv("ACT_DATADIR")
             elif scan == 'dr6v4':
                 data_dir = cf['act_data_dir_dr6v4']
             else: 
                 raise ValueError("Invalid scan type")
 
         elif inst == 'planck':
-            data_dir = cf['planck_data_dir']
+            data_dir = os.getenv("PLANCK_DATADIR")
         
         else: 
             raise ValueError("Undefined instrument.")
@@ -338,7 +339,7 @@ def main():
         inst2 = combo[1].split('_')[2]
         scan2 = combo[1].split('_')[3]
 
-        tpsd = np.load(f"{dir_base}/cov/cov_{freq1}_{array1}_{inst1}_{scan1}_{freq2}_{array2}_{inst2}_{scan2}.npy")
+        tpsd = np.load(f"{cov_dir}/cov_{freq1}_{array1}_{inst1}_{scan1}_{freq2}_{array2}_{inst2}_{scan2}.npy")
         
         covar_list.append(tpsd.ravel())
 
