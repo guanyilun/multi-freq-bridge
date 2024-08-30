@@ -644,7 +644,7 @@ def plot_image(image,
                                        ImageNormalize,
                                        simple_norm)
 
-    fig = plt.figure(figsize=(10, 10))
+    fig = plt.figure(figsize=(5, 5))
 
     if projection is not None:
         ax = fig.add_subplot(111, projection=projection)

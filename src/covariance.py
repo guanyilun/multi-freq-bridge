@@ -179,11 +179,12 @@ def get_covariance(freq1,
         
         all_regions_spsd.append(enmap.ndmap(np.array(spsd), wcs=data_wcs))
 
+    # average over all except the last region
     mean_spsd = np.mean(all_regions_spsd[:-1], axis=0)
     mean_spsd = enmap.ndmap(np.array(mean_spsd), wcs=data_wcs)
 
-    mean_npsd = np.mean(all_regions_npsd, axis=0)
-    #mean_npsd = all_regions_npsd[-1] # cluster region
+    # average over all regions
+    mean_npsd = np.mean(all_regions_npsd[:-1], axis=0)
     mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
 
     if cf['rad_avg_noise']:
@@ -217,6 +218,7 @@ def get_covariance(freq1,
     if cf['smooth_total']:
         mean_tpsd_cluster = gaussian_filter(input=mean_tpsd_cluster, sigma=cf['smooth_total_pix'])
     
+    # mean_tpsd_cluster = np.abs(mean_tpsd_cluster)
     mean_tpsd_cluster = enmap.ndmap(np.array(mean_tpsd_cluster), wcs=data_wcs)
     
     return mean_tpsd_cluster, mean_npsd, mean_spsd, all_regions_npsd, all_regions_spsd
@@ -447,7 +449,6 @@ def get_covariance_sample(freq1,
     mean_spsd = enmap.ndmap(np.array(mean_spsd), wcs=data_wcs)
 
     mean_npsd = np.mean(all_regions_npsd, axis=0)
-    #mean_npsd = all_regions_npsd[-1] # cluster region
     mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
 
     if cf['rad_avg_noise']:
@@ -490,14 +491,15 @@ def get_covariance_sample(freq1,
     
     return mean_tpsd_cluster, mean_npsd_iterators, mean_spsd
 
-def func(l, l_knee, alpha, white_noise, eps=1e-3):
+def func(l, l_knee, alpha, white_noise, eps=1):
     return ( (l_knee / (l+eps) )**-alpha + 1 ) * white_noise**2.
 
 def smoothing(l_npsd, 
               b_npsd, 
               twoD_npsd_orig, 
               gauss_smooth_sigma, 
-              mask_value, geometry):
+              mask_value, 
+              geometry):
     # 1) 2D noise power spectrum in Fourier space (real and imag part): 2d_psd_orig
     # 2) Make a binned version which in 1D for the abs value (2 arrays, psd, and ell)
     # 3) Fit a functional form to the array above (3 parameters: alpha, knee, and white noise)
@@ -523,20 +525,22 @@ def smoothing(l_npsd,
     # Fit the curve using filtered data
     params, _ = curve_fit(func, x_filtered, y_filtered, sigma=y_filtered**0.5, p0=p0)
 
-    print("Fitted parameters: ", params)
+    #print("Fitted parameters: ", params)
 
     # Step 4: 2D projection of the fitted function form: 2d_psd_fit
     modlmap = enmap.modlmap(*geometry)
 
     twoD_npsd_fit = func(modlmap, *params)
 
-    # Step 5: 2d_residual = 2d_psd_orig / 2d_psd_fit
-    twoD_residual = twoD_npsd_orig / twoD_npsd_fit
+    # # Step 5: 2d_residual = 2d_psd_orig / 2d_psd_fit
+    # twoD_residual = twoD_npsd_orig / twoD_npsd_fit
 
-    # Step 6: 2d_residual_smooth = SMOOTH(2d_residual)
-    twoD_residual_smooth = gaussian_filter(input=twoD_residual, sigma=gauss_smooth_sigma)
+    # # Step 6: 2d_residual_smooth = SMOOTH(2d_residual)
+    # twoD_residual_smooth = gaussian_filter(input=twoD_residual, sigma=gauss_smooth_sigma)
 
-    # Step 7: 2d_psd_final = 2d_psd_fit * 2d_residual_smooth
-    twoD_npsd_smooth = twoD_npsd_fit * twoD_residual_smooth
+    # # Step 7: 2d_psd_final = 2d_psd_fit * 2d_residual_smooth
+    # twoD_npsd_smooth = twoD_npsd_fit * twoD_residual_smooth
 
-    return twoD_npsd_smooth
+    # return twoD_npsd_smooth
+
+    return twoD_npsd_fit

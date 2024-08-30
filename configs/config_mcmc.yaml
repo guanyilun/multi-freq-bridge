@@ -6,10 +6,10 @@ region_width: 2.25 # degrees
 c1_ra: 44.751 # degrees
 c1_dec: 13.572
 
-c1_ra_min: 44.65
-c1_ra_max: 44.85
-c1_dec_min: 13.47
-c1_dec_max: 13.67
+c1_ra_min: 44.74
+c1_ra_max: 44.76
+c1_dec_min: 13.55
+c1_dec_max: 13.585
 
 c1_muo: -0.5566122489553409
 c1_beta_min: 0.1
@@ -131,13 +131,13 @@ data:
   - 220_pa4_act_dr6v2
   - 150_pa5_act_dr6v2
   - 98_pa5_act_dr6v2
-  - 98_pa6_act_dr6v2
-  - 150_pa6_act_dr6v2
-  # - 30_npipe_planck_sky
-  # - 44_npipe_planck_sky
-  # - 70_npipe_planck_sky
-  - 100_npipe_planck_sky
-  - 143_npipe_planck_sky
-  - 217_npipe_planck_sky
-  - 353_npipe_planck_sky
-  - 545_npipe_planck_sky
+  # - 98_pa6_act_dr6v2
+  # - 150_pa6_act_dr6v2
+  #- 30_npipe_planck_sky
+  #- 44_npipe_planck_sky
+  #- 70_npipe_planck_sky
+  # - 100_npipe_planck_sky
+  # - 143_npipe_planck_sky
+  # - 217_npipe_planck_sky
+  # - 353_npipe_planck_sky
+  #- 545_npipe_planck_sky
