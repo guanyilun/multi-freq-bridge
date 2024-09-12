@@ -16,6 +16,9 @@ import sys
 import warnings
 warnings.filterwarnings('ignore')
 
+# Pretty table
+from prettytable import PrettyTable
+
 # Custom modules
 sys.path.insert(0, "src")
 import utils as ut
@@ -23,6 +26,21 @@ import model
 
 dir_base = os.getenv("DIRE_BASE")
 cov_dir = os.getenv("COV_DIR")
+
+def print_matrix_pretty(matrix):
+    # Create PrettyTable object
+    table = PrettyTable()
+    
+    # Set column names
+    table.field_names = [f"Col {i+1}" for i in range(matrix.shape[1])]
+    
+    # Format each element in scientific notation
+    for row in matrix:
+        formatted_row = [f"{elem:.3e}" for elem in row]
+        table.add_row(formatted_row)
+    
+    # Print the table
+    print(table)
 
 def get_initial_params(cf, n_walkers):
     
@@ -326,6 +344,7 @@ def main():
         combos.append(combo)
 
     covar_list = []
+    covar_list_real = []
     
     for _, combo in enumerate(combos):
         # print(f"Combo: {combo}")
@@ -340,8 +359,10 @@ def main():
         scan2 = combo[1].split('_')[3]
 
         tpsd = np.load(f"{cov_dir}/cov_{freq1}_{array1}_{inst1}_{scan1}_{freq2}_{array2}_{inst2}_{scan2}.npy")
+        tpsd_real = np.fft.ifft2(tpsd).real
         
         covar_list.append(tpsd.ravel())
+        covar_list_real.append(tpsd_real.ravel())
 
     data_list_array = np.array(data_list)
     beam_list_array = np.array(beam_list)
@@ -349,7 +370,34 @@ def main():
     npix = len(data_list_array[0].ravel())
     nmaps = len(cf['data'])
 
-    icov = np.linalg.inv(np.array(covar_list).T.reshape(npix, nmaps, nmaps))
+    cov = np.array(covar_list).T.reshape(npix, nmaps, nmaps)
+    cov_real = np.array(covar_list_real).T.reshape(npix, nmaps, nmaps)
+    icov = np.linalg.inv(cov)
+    
+    # Testing
+
+    test_cov = False
+
+    if test_cov:
+        for idx in range(npix):
+            cov_idx = np.array( cov[idx, :, :] )
+            cov_idx_real = np.array( cov_real[idx, :, :] )
+
+            # # print the matrix in the form of a matrix in the terminal
+            print_matrix_pretty(cov_idx)
+            print_matrix_pretty(cov_idx_real)
+
+            is_valid_real, message = ut.check_real_covariance(cov_idx_real)
+
+            if not is_valid_real:
+                print(f"Real check fail: Index: {idx}")
+                print(message)
+
+            is_valid_complex, message = ut.check_complex_covariance(cov_idx)
+
+            if not is_valid_complex:
+                print(f"Complex check fail: Index: {idx}")
+                print(message)
 
     xgrid, ygrid = np.meshgrid(np.arange(0, data_shape[1], 1), 
                                np.arange(0, data_shape[0], 1))

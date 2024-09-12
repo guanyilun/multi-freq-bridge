@@ -1,15 +1,15 @@
 region_center_ra: 44.5916744
 region_center_dec: 13.2999979
-region_width: 2.25 # degrees
+region_width: 2.5 # degrees
 
 # Cluster 1
 c1_ra: 44.751 # degrees
 c1_dec: 13.572
 
-c1_ra_min: 44.74
-c1_ra_max: 44.76
-c1_dec_min: 13.55
-c1_dec_max: 13.585
+c1_ra_min: 44.7
+c1_ra_max: 44.8
+c1_dec_min: 13.48
+c1_dec_max: 13.62
 
 c1_muo: -0.5566122489553409
 c1_beta_min: 0.1
@@ -79,7 +79,7 @@ fil_l0_max_arcmin: 30
 fil_w0_min_arcmin: 0
 fil_w0_max_arcmin: 30
 fil_Dtau_min: 0
-fil_Dtau_max: 0.005
+fil_Dtau_max: 0.01
 
 fil_A_D_min: 0
 fil_A_D_max: 1000000
@@ -98,7 +98,7 @@ beam_version: "dr6v2"
 n_walkers: 100
 n_iter: 100000000
 mcmc_filename: run_test.h5
-apod_pix: 20
+apod_pix: 0
 system_type: real
 noise_type: inst
 
@@ -131,13 +131,13 @@ data:
   - 220_pa4_act_dr6v2
   - 150_pa5_act_dr6v2
   - 98_pa5_act_dr6v2
-  # - 98_pa6_act_dr6v2
-  # - 150_pa6_act_dr6v2
-  #- 30_npipe_planck_sky
-  #- 44_npipe_planck_sky
-  #- 70_npipe_planck_sky
-  # - 100_npipe_planck_sky
-  # - 143_npipe_planck_sky
+  - 98_pa6_act_dr6v2
+  - 150_pa6_act_dr6v2
+  # - 30_npipe_planck_sky
+  # - 44_npipe_planck_sky
+  # - 70_npipe_planck_sky
+  - 100_npipe_planck_sky
+  - 143_npipe_planck_sky
   # - 217_npipe_planck_sky
   # - 353_npipe_planck_sky
-  #- 545_npipe_planck_sky
+  # - 545_npipe_planck_sky
