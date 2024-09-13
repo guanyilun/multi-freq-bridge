@@ -28,7 +28,6 @@ dir_base = os.getenv("DIRE_BASE")
 cov_dir = os.getenv("COV_DIR")
 
 def print_matrix_pretty(matrix):
-    # Create PrettyTable object
     table = PrettyTable()
     
     # Set column names
@@ -375,29 +374,29 @@ def main():
     icov = np.linalg.inv(cov)
     
     # Testing
-
-    test_cov = False
+    test_cov = True
 
     if test_cov:
         for idx in range(npix):
             cov_idx = np.array( cov[idx, :, :] )
             cov_idx_real = np.array( cov_real[idx, :, :] )
 
-            # # print the matrix in the form of a matrix in the terminal
             print_matrix_pretty(cov_idx)
-            print_matrix_pretty(cov_idx_real)
+            #print_matrix_pretty(cov_idx_real)
 
-            is_valid_real, message = ut.check_real_covariance(cov_idx_real)
+           # is_valid_real, message = ut.check_real_covariance(cov_idx_real)
 
-            if not is_valid_real:
-                print(f"Real check fail: Index: {idx}")
-                print(message)
+            # if not is_valid_real:
+            #     print(f"Real check fail: Index: {idx}")
+            #     print(message)
 
             is_valid_complex, message = ut.check_complex_covariance(cov_idx)
 
             if not is_valid_complex:
                 print(f"Complex check fail: Index: {idx}")
                 print(message)
+
+    # Testing
 
     xgrid, ygrid = np.meshgrid(np.arange(0, data_shape[1], 1), 
                                np.arange(0, data_shape[0], 1))
