@@ -43,7 +43,8 @@ def get_covariance(freq1,
                    data_wcs, 
                    data_dir1, 
                    data_dir2,
-                   cf):
+                   cf, 
+                   debug_pix_noise=(False, False)):
 
     regions = ut.get_all_regions(region_center_ra=cf['region_center_ra'],
                                  region_center_dec=cf['region_center_dec'],
@@ -147,6 +148,24 @@ def get_covariance(freq1,
 
                 diff1_fft = np.fft.fft2(diff1_apod)
                 diff2_fft = np.fft.fft2(diff2_apod)
+
+                if debug_pix_noise[0] == True:
+                    print("Debug: add artificial noise to the high ell region in diff1.")
+                    target = diff1_fft
+                    modlmap = enmap.modlmap(coadd1_map.shape, coadd1_map.wcs)
+                    m1 = np.logical_and(modlmap >= 5000, modlmap <= 6000)
+                    m2 = modlmap >= 6000
+                    mean_var = np.mean(target[m1]).real
+                    target[m2] = mean_var * 1000 + 0.j
+
+                if debug_pix_noise[1] == True:
+                    print("Debug: add artificial noise to the high ell region in diff2.")
+                    target = diff2_fft
+                    modlmap = enmap.modlmap(coadd1_map.shape, coadd1_map.wcs)
+                    m1 = np.logical_and(modlmap >= 5000, modlmap <= 6000)
+                    m2 = modlmap >= 6000
+                    mean_var = np.mean(target[m1]).real
+                    target[m2] = mean_var * 1000 + 0.j
 
                 weight = np.mean(ivar1_norm * apod_mask1 * ivar2_norm * apod_mask2)
 
