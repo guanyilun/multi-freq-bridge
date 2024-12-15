@@ -11,3 +11,6 @@ mcmc_test:
 
 cov:
 	python cov_maker.py
+
+check_cov_valid:
+	python test_cov_valid.py

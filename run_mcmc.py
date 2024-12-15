@@ -377,7 +377,7 @@ def main():
     nmaps = len(cf['data'])
 
     cov = np.array(covar_list).T.reshape(npix, nmaps, nmaps)
-    cov_real = np.array(covar_list_real).T.reshape(npix, nmaps, nmaps)
+    # cov_real = np.array(covar_list_real).T.reshape(npix, nmaps, nmaps)
     icov = np.linalg.inv(cov)
     
     # Testing
@@ -386,10 +386,10 @@ def main():
     if test_cov:
         for idx in range(npix):
             cov_idx = np.array( cov[idx, :, :] )
-            cov_idx_real = np.array( cov_real[idx, :, :] )
+            # cov_idx_real = np.array( cov_real[idx, :, :] )
 
-            print_matrix_pretty(cov_idx)
-            #print_matrix_pretty(cov_idx_real)
+            # print_matrix_pretty(cov_idx)
+            # print_matrix_pretty(cov_idx_real)
 
            # is_valid_real, message = ut.check_real_covariance(cov_idx_real)
 
@@ -400,8 +400,12 @@ def main():
             is_valid_complex, message = ut.check_complex_covariance(cov_idx)
 
             if not is_valid_complex:
+                print_matrix_pretty(cov_idx)
                 print(f"Complex check fail: Index: {idx}")
                 print(message)
+                sys.exit(-1)
+
+    print("All good!")
 
     # Testing
 
