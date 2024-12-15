@@ -622,6 +622,38 @@ def coadd_act(nways, dire, wcs_ref, obstype, plot_coadd=True, use_srcfree_maps=T
             else: 
                 raise ValueError("Invalid number of ways/splits.")
 
+def check_real_covariance(matrix):
+    # Check if the matrix is square
+    if matrix.shape[0] != matrix.shape[1]:
+        return False, "Matrix is not square"
+
+    # Check if the matrix is symmetric
+    if not np.allclose(matrix, matrix.T):
+       return False, "Matrix is not symmetric"
+
+    # Check if the matrix is positive semidefinite
+    eigenvalues = np.linalg.eigvals(matrix)
+    if np.any(eigenvalues) < 0:
+        return False, "Matrix is not positive semidefinite"
+
+    return True, "Matrix is a valid real covariance matrix"
+
+def check_complex_covariance(matrix):
+    # Check if the matrix is square
+    if matrix.shape[0] != matrix.shape[1]:
+        return False, "Matrix is not square"
+
+    # Check if the matrix is Hermitian
+    if not np.allclose(matrix, np.conjugate(matrix.T)):
+        return False, "Matrix is not Hermitian"
+
+    # Check if the matrix is positive semidefinite
+    eigenvalues = np.linalg.eigvals(matrix)
+    if np.any(np.real(eigenvalues) < 0):
+        return False, "Matrix is not positive semidefinite"
+
+    return True, "Matrix is a valid complex covariance matrix"
+
 def plot_image(image,
                cmap='viridis',
                title='',
