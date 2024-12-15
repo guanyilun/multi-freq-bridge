@@ -155,6 +155,7 @@ def get_covariance(freq1,
                 noise_all_splits_loop.append(npsd_region)
 
             npsd = (1/(max_split_number*(max_split_number-1))) * np.sum(noise_all_splits_loop, axis=0)
+            # npsd = (1/max_split_number) * np.sum(noise_all_splits_loop, axis=0)
 
             all_regions_npsd.append(enmap.ndmap(np.array(npsd), wcs=data_wcs))
         
@@ -532,15 +533,52 @@ def smoothing(l_npsd,
 
     twoD_npsd_fit = func(modlmap, *params)
 
-    # # Step 5: 2d_residual = 2d_psd_orig / 2d_psd_fit
-    # twoD_residual = twoD_npsd_orig / twoD_npsd_fit
+    # Step 5: 2d_residual = 2d_psd_orig / 2d_psd_fit
+    twoD_residual = twoD_npsd_orig / twoD_npsd_fit
 
-    # # Step 6: 2d_residual_smooth = SMOOTH(2d_residual)
-    # twoD_residual_smooth = gaussian_filter(input=twoD_residual, sigma=gauss_smooth_sigma)
+    # Step 6: 2d_residual_smooth = SMOOTH(2d_residual)
+    if gauss_smooth_sigma > 0:
+        twoD_residual_smooth = gaussian_filter(input=twoD_residual, sigma=gauss_smooth_sigma)
+    else:
+        twoD_residual_smooth = twoD_residual
 
-    # # Step 7: 2d_psd_final = 2d_psd_fit * 2d_residual_smooth
-    # twoD_npsd_smooth = twoD_npsd_fit * twoD_residual_smooth
+    # Step 7: 2d_psd_final = 2d_psd_fit * 2d_residual_smooth
+    twoD_npsd_smooth = twoD_npsd_fit * twoD_residual_smooth
 
-    # return twoD_npsd_smooth
+    return twoD_npsd_smooth
+
+
+def fit_one_over_f(l_npsd, 
+                   b_npsd, 
+                   mask_value, 
+                   geometry):
+    # 1) 2D noise power spectrum in Fourier space (real and imag part): 2d_psd_orig
+    # 2) Make a binned version which in 1D for the abs value (2 arrays, psd, and ell)
+    # 3) Fit a functional form to the array above (3 parameters: alpha, knee, and white noise)
+    # 4) 2D projection of the fitted function form: 2d_psd_fit
+    
+    # Step 3: Fit a functional form to the array above (3 parameters: alpha, knee, and white noise)
+    x = l_npsd
+    y = b_npsd
+    mask = x >= mask_value
+
+    x_filtered = x[mask]
+    y_filtered = y[mask]
+
+    # Initial guess for parameters
+    # Find the average of values between l = 5000 and l = 10000
+    white_noise = np.mean(y_filtered[(x_filtered > 5000) & (x_filtered < 10000)])
+
+    p0 = [2000, -3, np.sqrt(white_noise)]  # initial guess for l_knee, alpha, white_noise
+
+    # Fit the curve using filtered data
+    params, _ = curve_fit(func, x_filtered, y_filtered, sigma=y_filtered**0.5, p0=p0)
+
+    #print("Fitted parameters: ", params)
+
+    # Step 4: 2D projection of the fitted function form: 2d_psd_fit
+    modlmap = enmap.modlmap(*geometry)
+
+    twoD_npsd_fit = func(modlmap, *params)
 
     return twoD_npsd_fit

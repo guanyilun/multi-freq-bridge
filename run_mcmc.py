@@ -14,6 +14,7 @@ import itertools
 import glob
 import sys
 import warnings
+import scipy
 warnings.filterwarnings('ignore')
 
 # Custom modules
@@ -153,7 +154,9 @@ def lnlike_loop(resid, icov):
     like_loop = 0
     
     for idx in range(npix):
+        # norm = np.log(np.linalg.det(icov[idx, :, :])).real
         like_loop += (-0.5 * (np.conj(resid[idx, :]) @ icov[idx, :, :] @ resid[idx, :].T)).real
+        # like_loop += -0.5 * norm
     
     return like_loop
 
@@ -351,6 +354,17 @@ def main():
 
     icov = np.linalg.inv(np.array(covar_list).T.reshape(npix, nmaps, nmaps))
 
+    # temp
+    # covar_array = np.array(covar_list).T.reshape(npix, nmaps, nmaps)
+    # icov = np.zeros_like(covar_array)
+
+    # for i in range(npix):
+    #     U, s, Vh = scipy.linalg.svd(covar_array[i])
+    #     s_inv = 1 / s
+    #     # icov[i] = np.dot(Vh.T @ np.diag(s_inv), U.T)
+    #     icov[i] = Vh.T @ np.diag(s_inv) @ U.T
+    # # end temp
+
     xgrid, ygrid = np.meshgrid(np.arange(0, data_shape[1], 1), 
                                np.arange(0, data_shape[0], 1))
     
@@ -397,6 +411,7 @@ def main():
     backend = emcee.backends.HDFBackend(mcmc_filepath)
     
     print("Running MCMC.")
+
     with MPIPool() as pool:
         if not pool.is_master():
             pool.wait()
@@ -407,8 +422,20 @@ def main():
                                         log_prob_fn=lnprob, 
                                         pool=pool, 
                                         backend=backend)
-        
-        sampler.run_mcmc(initial_state=init_params, nsteps=cf['n_iter'], progress=True)
+
+        # sampler.run_mcmc(initial_state=init_params, nsteps=cf['n_iter'])
+        nsteps = cf['n_iter']
+        for i, result in enumerate(sampler.sample(init_params, iterations=nsteps)):
+            # Calculate the iteration number based on the current sample
+            iteration = i + 1
+
+            # Calculate acceptance fraction for the current step
+            acceptance_fraction = np.mean(sampler.acceptance_fraction)
+
+            # Manually control the output to include acceptance fraction
+            if (iteration % 1 == 0 or iteration == nsteps):
+                # Print out the current iteration, total iterations, and acceptance fraction
+                print(f"Step: {iteration}/{nsteps}: acceptance fraction = {acceptance_fraction:.3f}", end="\r")
 
 if __name__ == "__main__":
     main()
