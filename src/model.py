@@ -85,6 +85,7 @@ class Filament():
         
         sz_signal = numerator / bandpass_int
 
+        # dust signal
         freq_ref = 545 
         T_D = 20 
         beta_D = 1.5
@@ -104,9 +105,8 @@ class Filament():
         
         dust_signal = numerator_dust / bandpass_int
 
-        dust_signal *= bridge_shape
-
-        total_model = (bridge_shape * sz_signal) + dust_signal
+        # modulate dust signal with bridge shape (mesa model)
+        total_model = bridge_shape * (sz_signal + dust_signal)
 
         return total_model
 
@@ -204,9 +204,9 @@ class Cluster():
                                     x=freq_array, dx=del_freq)
         
         dust_signal = numerator_dust / bandpass_int
-        dust_signal *= beta_density_map_2d
+        # dust_signal *= beta_density_map_2d
 
-        total_model = (beta_density_map_2d * sz_signal) + dust_signal
+        total_model = beta_density_map_2d * (sz_signal + dust_signal)
         
         return total_model
 

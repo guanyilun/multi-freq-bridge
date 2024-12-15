@@ -78,39 +78,43 @@ def get_initial_params(cf, n_walkers):
     v_avg_init = np.random.uniform(cf['v_avg_min'], cf['v_avg_max'], size=n_walkers)
     #v_delta_init = np.random.uniform(cf['v_delta_min'], cf['v_delta_max'], size=n_walkers)
 
-    ret_array = np.array([c1_ra_init,
-                        c1_dec_init,
-                        c1_beta_init,
-                        c1_rc_arcmin_init,
-                        c1_R_init,
-                        c1_theta_init,
-                        c1_Dtau_init,
-                        c1_Te_init,
-                        c1_A_D_init,  
+    # Define the initial parameter array with indices
+    ret_array = np.array([
+        # Cluster 1: Abell 401
+        c1_ra_init,         # 0 - Right Ascension
+        c1_dec_init,        # 1 - Declination
+        c1_beta_init,       # 2 - Beta
+        c1_rc_arcmin_init,  # 3 - Core radius (arcminutes)
+        c1_R_init,          # 4 - Radius
+        c1_theta_init,      # 5 - Theta
+        c1_Dtau_init,       # 6 - Optical depth
+        c1_Te_init,         # 7 - Electron temperature
+        c1_A_D_init,        # 8 - Amplitude of dust
 
-                        c2_ra_init,
-                        c2_dec_init,
-                        c2_beta_init,
-                        c2_rc_arcmin_init,
-                        c2_R_init,
-                        c2_theta_init,
-                        c2_Dtau_init,
-                        c2_Te_init,
-                        c2_A_D_init,  
+        # Cluster 2: Abell 399
+        c2_ra_init,         # 9 - Right Ascension
+        c2_dec_init,        # 10 - Declination
+        c2_beta_init,       # 11 - Beta
+        c2_rc_arcmin_init,  # 12 - Core radius (arcminutes)
+        c2_R_init,          # 13 - Radius
+        c2_theta_init,      # 14 - Theta
+        c2_Dtau_init,       # 15 - Optical depth
+        c2_Te_init,         # 16 - Electron temperature
+        c2_A_D_init,        # 17 - Amplitude of dust
 
-                        fil_ra_init,
-                        fil_dec_init,
-                        fil_l0_init,
-                        fil_w0_init,
-                        fil_Dtau_init,
-                        fil_Te_init,
-                        fil_A_D_init,
+        # Filament
+        fil_ra_init,        # 18 - Right Ascension
+        fil_dec_init,       # 19 - Declination
+        fil_l0_init,        # 20 - Length (pixels)
+        fil_w0_init,        # 21 - Width (pixels)
+        fil_Dtau_init,       # 22 - Optical depth
+        fil_Te_init,         # 23 - Electron temperature
+        fil_A_D_init,        # 24 - Amplitude of dust
 
-                        v_avg_init
-                        #v_delta_init
-
-                            ]).T
-            
+        # Average velocity
+        v_avg_init          # 25 - Average velocity
+        #v_delta_init       # 26 - Velocity difference (commented out)
+    ]).T
     return ret_array
             
 def lnprior(theta):    
@@ -377,7 +381,7 @@ def main():
     icov = np.linalg.inv(cov)
     
     # Testing
-    test_cov = True
+    test_cov = False
 
     if test_cov:
         for idx in range(npix):

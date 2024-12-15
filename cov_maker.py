@@ -24,9 +24,6 @@ import covariance as cov
 
 import matplotlib.pyplot as plt
 
-#%%
-
-
 # %%
 config_data_fname = os.environ["REPO_DIR"] + "/configs/config_mcmc.yaml"
 
@@ -100,11 +97,11 @@ def process_combo_cov(combo,
     elif inst2 == 'planck':
         data_dir2 = os.getenv("PLANCK_DATADIR")
 
-    # print("Calculating covariance for: {}".format(combo))
-    if 0:
-        debug_pix_noise = (inst1 == 'planck', inst2 == 'planck')
-    else:
-        debug_pix_noise = (False, False)
+    print("Calculating covariance for: {}".format(combo))
+    # if 0:
+    #     debug_pix_noise = (inst1 == 'planck', inst2 == 'planck')
+    # else:
+    debug_pix_noise = (False, False)
 
     mean_tpsd, mean_npsd, mean_spsd, all_regions_npsd, all_regions_spsd = cov.get_covariance(freq1=freq1, 
                                                                                     freq2=freq2,

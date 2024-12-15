@@ -104,15 +104,15 @@ rad_avg_total: 0
 rad_avg_bsize: 200
 smooth_noise: 0 # if you want to smooth the noise cov, boolean
 smooth_signal: 0 # if you want to smooth the signal cov, boolean
-# smooth_total: 1 # if you want to smooth the total cov, boolean
-smooth_total: 0 # if you want to smooth the total cov, boolean
+smooth_total: 1 # if you want to smooth the total cov, boolean
+# smooth_total: 0 # if you want to smooth the total cov, boolean
 smooth_signal_type: gaussian
 smooth_noise_type: gaussian
 smooth_total_type: gaussian
 smooth_signal_pix: 1.25
 smooth_noise_pix: 1.25
 smooth_total_pix: 1.25 # pixels the sigma
-min_ell_fit: 500 # For the minimum ell to fit the data for smoothing the noise cov
+# min_ell_fit: 500 # For the minimum ell to fit the data for smoothing the noise cov
 # Miscellaneaus parameters
 temp_model_type: isothermal
 repeat_h5: "true"

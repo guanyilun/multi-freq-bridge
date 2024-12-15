@@ -1,7 +1,1 @@
-astropy
-pixell
-emcee
-numba
-scipy
-schwimmbad
-python-dotenv
+prettytable
