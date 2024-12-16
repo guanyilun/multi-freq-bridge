@@ -1,6 +1,7 @@
 .DEFAULT_GOAL = mcmc_test
 
 mcmc_test:
+	# need to run `module load openmpi` first
 	@if [ -f /fs/lustre/scratch/yguan/data/multi-freq-bridge/run_test.h5 ]; \
 	then \
 		rm /fs/lustre/scratch/yguan/data/multi-freq-bridge/run_test.h5; \

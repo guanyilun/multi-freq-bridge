@@ -94,7 +94,7 @@ beam_version: "dr6v2"
 n_walkers: 100
 n_iter: 100000000
 mcmc_filename: run_test.h5
-apod_pix: 0
+apod_pix: 20
 system_type: real
 noise_type: inst
 # Covariance related
@@ -112,7 +112,7 @@ smooth_total_type: gaussian
 smooth_signal_pix: 1.25
 smooth_noise_pix: 1.25
 smooth_total_pix: 1.25 # pixels the sigma
-# min_ell_fit: 500 # For the minimum ell to fit the data for smoothing the noise cov
+min_ell_fit: 500 # For the minimum ell to fit the data for smoothing the noise cov
 # Miscellaneaus parameters
 temp_model_type: isothermal
 repeat_h5: "true"
@@ -121,13 +121,13 @@ data:
   # - 220_pa4_act_dr6v2
   - 150_pa5_act_dr6v2
   - 98_pa5_act_dr6v2
-  - 98_pa6_act_dr6v2
-  - 150_pa6_act_dr6v2
+  # - 98_pa6_act_dr6v2
+  # - 150_pa6_act_dr6v2
   # - 30_npipe_planck_sky
   # - 44_npipe_planck_sky
   # - 70_npipe_planck_sky
-  # - 100_npipe_planck_sky
+  - 100_npipe_planck_sky
   - 143_npipe_planck_sky
-  - 217_npipe_planck_sky
-  - 353_npipe_planck_sky
+  # - 217_npipe_planck_sky
+  # - 353_npipe_planck_sky
   # - 545_npipe_planck_sky

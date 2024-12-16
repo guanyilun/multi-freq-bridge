@@ -119,21 +119,28 @@ def process_combo_cov(combo,
                                                                                     
                                                                                     cf=config_data,
                                                                                     debug_pix_noise=debug_pix_noise,)
-
     # rescale planck noise level below pixel scale such that ACT will dominate in those scales
-    # if (inst1 == 'planck' and inst2 == 'planck'):
-    #     print(f"combo = {combo}")
-    #     modlmap = enmap.modlmap(data_shape, data_wcs)
-    #     m = np.logical_and(modlmap >= 5000, modlmap <= 6000)
-    #     mean_var = np.mean(mean_tpsd[m]).real * 100
-    #     # mean_var = np.inf
-    #     # mean_var = 1e25
-    #     print(f"Mean variance: {mean_var:.2e}")
-    #     m2 = modlmap>6000
-    #     mean_tpsd[m2] = mean_var
-    #     mean_tpsd = mean_tpsd + 0j
+    if (inst1 == 'planck' and (combo[0] == combo[1])):
+        print(f"combo = {combo}")
+        
+        modlmap = enmap.modlmap(data_shape, data_wcs)
+        # 1. taking mean power from tpsd in the range 5000-6000
+        if float(freq1) >= 80:
+            limits = [5000, 6000]
+        else:
+            limits = [2000, 3000]
+        m = np.logical_and(modlmap >= limits[0], modlmap <= limits[1])
+        mean_var = np.mean(mean_tpsd[m]).real
 
-    # Do the scaling under these cases
+        # mean_var = np.inf
+        # mean_var = 1e25
+        print(f"Mean variance: {mean_var:.2e}")
+        m2 = modlmap>limits[1]
+        mean_tpsd[m2] = mean_var
+        mean_tpsd = mean_tpsd + 0j
+        print(mean_tpsd.wcs)
+
+    # apply ell-dependent scaling to the pa4-pa5 noise power spectrum
     if 0:
     # if (inst1 == 'act' and inst2 == 'act') and (array1 in ['pa4', 'pa5'] or array2 in ['pa4', 'pa5']):
     # if ( (inst1 == 'act' and inst2 == 'act') 
