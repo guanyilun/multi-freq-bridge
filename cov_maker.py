@@ -141,62 +141,71 @@ def process_combo_cov(combo,
         print(mean_tpsd.wcs)
 
     # apply ell-dependent scaling to the pa4-pa5 noise power spectrum
-    if 0:
-    # if (inst1 == 'act' and inst2 == 'act') and (array1 in ['pa4', 'pa5'] or array2 in ['pa4', 'pa5']):
-    # if ( (inst1 == 'act' and inst2 == 'act') 
-    #      and (array1 in ['pa4', 'pa5'] 
-    #      or array2 in ['pa4', 'pa5'])
-    #      and (array1 == array2) ):
-
-        # print("Scaling the noise power spectrum")
-        
+    # if 1:
+    # if 0:
+    if combo[0] == combo[1] and (array1 in ['pa4', 'pa5']):
         binsize = 200
 
         # get the avg noise power spectrum in 1D space from all the regions
         # b_regions, l_regions = [], []
         # for region in all_regions_npsd:
-        #     b_npsd, l_npsd = enmap.lbin(map=np.abs(region), bsize=binsize)
+        #     b_npsd, l_npsd = enmap.lbin(map=region.real, bsize=binsize)  # should be real in auto case
+        #     # b_npsd, l_npsd = enmap.lbin(map=np.abs(region), bsize=binsize)
         #     b_regions.append(b_npsd) 
         #     l_regions.append(l_npsd)
+
+        # two ways of computing the average 1d noise power spectrum:
+        # 1. compute 1d noise power spectrum for each region and average them
+        # 2. average the 2d noise power spectrum over all regions and compute 1d noise power spectrum
+        # they should be the same for auto cases, when all covariances are 
 
         # b_avg = np.mean(b_regions[:-1], axis=0)
         # l_avg = np.mean(l_regions[:-1], axis=0)
         mean_npsd_regions = enmap.ndmap(np.mean(all_regions_npsd[:-1], axis=0), wcs=geometry[1])
-        b_avg, l_avg = enmap.lbin(map=np.abs(mean_npsd_regions), bsize=binsize)
+        # b_avg, l_avg = enmap.lbin(map=np.abs(mean_npsd_regions), bsize=binsize)
+        b_avg, l_avg = enmap.lbin(map=mean_npsd_regions.real, bsize=binsize)  # should be real in auto case
 
         # npsd from center region
         # b_npsd_center, l_npsd_center = b_regions[-1], l_regions[-1]
-        b_npsd_center, l_npsd_center = enmap.lbin(map=np.abs(all_regions_npsd[-1]), bsize=binsize)
+        # b_npsd_center, l_npsd_center = enmap.lbin(map=np.abs(all_regions_npsd[-1]), bsize=binsize)
+        b_npsd_center, l_npsd_center = enmap.lbin(map=all_regions_npsd[-1].real, bsize=binsize)  # should be real in auto case
 
         # 2D fit over all regions except the center
-        npsd_2d_regions_fit = cov.fit_one_over_f(l_npsd=l_avg,
-                                            b_npsd=b_avg,
-                                            # twoD_npsd_orig=np.mean(all_regions_npsd[:-1], axis=0),
-                                            # gauss_smooth_sigma=config_data["smooth_noise_pix"],
-                                            mask_value=config_data["min_ell_fit"],
-                                            geometry=geometry)
+        # npsd_2d_regions_fit = cov.fit_one_over_f(l_npsd=l_avg,
+        #                                     b_npsd=b_avg,
+        #                                     # twoD_npsd_orig=np.mean(all_regions_npsd[:-1], axis=0),
+        #                                     # gauss_smooth_sigma=config_data["smooth_noise_pix"],
+        #                                     # mask_value=config_data["min_ell_fit"],
+        #                                     mask_value=4000,
+        #                                     geometry=geometry)
         
-        # 2D fit over the center region
-        npsd_center_fit = cov.fit_one_over_f(l_npsd=l_npsd_center,
-                                        b_npsd=b_npsd_center,
-                                        # twoD_npsd_orig=all_regions_npsd[-1],
-                                        # gauss_smooth_sigma=config_data["smooth_noise_pix"],
-                                        mask_value=config_data["min_ell_fit"],
-                                        geometry=geometry)
+        # # 2D fit over the center region
+        # npsd_center_fit = cov.fit_one_over_f(l_npsd=l_npsd_center,
+        #                                 b_npsd=b_npsd_center,
+        #                                 # twoD_npsd_orig=all_regions_npsd[-1],
+        #                                 # gauss_smooth_sigma=config_data["smooth_noise_pix"],
+        #                                 # mask_value=config_data["min_ell_fit"],
+        #                                 mask_value=4000,
+        #                                 geometry=geometry)
         
-        scale_factor = npsd_center_fit / npsd_2d_regions_fit
+        # scale_factor = npsd_center_fit / npsd_2d_regions_fit
         modlmap = enmap.modlmap(*geometry) 
 
-        scale_factor[0][0] = 1
-        scale_factor[modlmap < config_data["min_ell_fit"]] = 1
-        # scale_factor = np.median(scale_factor[modlmap > 3000])
+        # scale_factor[0][0] = 1
+        # scale_factor[modlmap < config_data["min_ell_fit"]] = 1
+        # median_scale_factor = np.median(scale_factor[modlmap > 4000])
+        scale_factor = enmap.zeros(modlmap.shape, wcs=geometry[1])
+        # scale_factor[modlmap < 4000] = 1
+        # scale_factor[modlmap >= 4000] = 1e5
+        scale_factor[modlmap >= 4000] = 1e-2
+        scale_factor[modlmap < 4000] = 1e-5
+        # scale_factor[modlmap >= 4000] = 1e5
+        # scale_factor[modlmap >= 4000] = median_scale_factor
         # scale_factors[tuple(combo)] = scale_factor
         # scale_factor = np.round(scale_factor, 4) * 4
         # scale_factor = 0.7 
         # scale only autocase
-        if combo[0] != combo[1]:
-            scale_factor = 1
-        print(f"{tuple(combo)}: {scale_factor}")
+        print(f"{tuple(combo)}: {np.min(scale_factor)}")
 
         # ut.plot_image(image=np.fft.fftshift(scale_factor),
         #               title="Scale factor",
@@ -214,7 +223,6 @@ def process_combo_cov(combo,
         # scale_factor = np.random.uniform(0.5, 1.5)
         # scale_factor = round(scale_factor, 4)
         # print(f"{combo}: {scale_factor}")
-
 
         # corrected 2D noise power spectrum
         mean_npsd = np.mean(all_regions_npsd[:-1], axis=0) * scale_factor

@@ -173,8 +173,8 @@ def get_covariance(freq1,
 
                 noise_all_splits_loop.append(npsd_region)
 
-            npsd = (1/(max_split_number*(max_split_number-1))) * np.sum(noise_all_splits_loop, axis=0)
-            # npsd = (1/max_split_number) * np.sum(noise_all_splits_loop, axis=0)
+            # npsd = (1/(max_split_number*(max_split_number-1))) * np.sum(noise_all_splits_loop, axis=0)
+            npsd = (1/max_split_number) * np.sum(noise_all_splits_loop, axis=0)
 
             all_regions_npsd.append(enmap.ndmap(np.array(npsd), wcs=data_wcs))
         
@@ -205,8 +205,10 @@ def get_covariance(freq1,
 
     # average over all regions except the last region
     mean_npsd = np.mean(all_regions_npsd[:-1], axis=0)
-    #mean_npsd = all_regions_npsd[-1]
-    mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
+
+    # use the cluster center region for the noise
+    # mean_npsd = all_regions_npsd[-1]
+    # mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
 
     if cf['rad_avg_noise']:
         mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
