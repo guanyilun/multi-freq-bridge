@@ -121,8 +121,8 @@ def process_combo_cov(combo,
                                                                                     debug_pix_noise=debug_pix_noise,)
     
     # rescale planck noise level below pixel scale such that ACT will dominate in those scales
-    if 0:
-    #if (inst1 == 'planck' and (combo[0] == combo[1])):
+    #if 0:
+    if (inst1 == 'planck' and (combo[0] == combo[1])):
         print(f"combo = {combo}")
         modlmap = enmap.modlmap(data_shape, data_wcs)
         # 1. taking mean power from tpsd in the range 5000-6000
@@ -142,26 +142,57 @@ def process_combo_cov(combo,
         print(mean_tpsd.wcs)
         print("Fixing planck large ell noise")
 
-    # whiten ACT noise 
     if 0:
-    #if combo[0] == combo[1] and (array1 in ['pa4', 'pa5']):
-        print("Fixing ACT large ell noise")
+    # if (combo[0] == combo[1] and (inst1 == 'act')):
         print(f"combo = {combo}")
-        
         modlmap = enmap.modlmap(data_shape, data_wcs)
-        limit = 3000
-        m = modlmap >= limit
-        
-        cluster_npsd = np.abs(all_regions_npsd[-1])
-        mean_var = np.mean(cluster_npsd[m]).real
+        # 1. taking mean power from tpsd in the range 5000-6000
+        limits = [6000, 8000]
+        m = np.logical_and(modlmap >= limits[0], modlmap <= limits[1])
+        mean_var = np.mean(mean_tpsd[m]).real
 
         print(f"Mean variance: {mean_var:.2e}")
-        m2 = modlmap>limit
-        cluster_npsd[m2] = mean_var
-        cluster_npsd = cluster_npsd + 0j
-
-        mean_tpsd = mean_spsd + cluster_npsd
+        m2 = modlmap>limits[0]
+        mean_tpsd[m2] = mean_var
+        mean_tpsd = mean_tpsd + 0j
         print(mean_tpsd.wcs)
+        print("Fixing ACT large ell noise")
+
+    # whiten ACT noise 
+    #if 0:
+    # if combo[0] == combo[1] and (array1 in ['pa4', 'pa5']):
+    #     print("Fixing ACT large ell noise")
+    #     print(f"combo = {combo}")
+        
+    #     modlmap = enmap.modlmap(data_shape, data_wcs)
+    #     limits = [6000, 8000]
+    #     m = np.logical_and(modlmap >= limits[0], modlmap <= limits[1])
+
+    #     use_cluster_region = 1
+    #     use_outer_regions = 0
+
+    #     if use_cluster_region:
+    #         m2 = modlmap>limits[1]
+            
+    #         cluster_npsd = np.abs(all_regions_npsd[-1])
+    #         mean_var = np.mean(cluster_npsd[m]).real
+            
+    #         print(f"Mean variance: {mean_var:.2e}")
+            
+    #         cluster_npsd[m2] = mean_var
+    #         cluster_npsd = cluster_npsd + 0j
+
+    #         mean_tpsd = mean_spsd + cluster_npsd
+        
+    #     elif use_outer_regions:
+    #         mean_var = np.mean(mean_npsd[m]).real
+    #         print(f"Mean variance: {mean_var:.2e}")
+    #         mean_npsd[m] = mean_var
+    #         mean_npsd = mean_npsd + 0j
+
+    #         mean_tpsd = mean_spsd + mean_npsd
+
+    #     print(mean_tpsd.wcs)
 
     # debug
     # mean_tpsd = mean_npsd
