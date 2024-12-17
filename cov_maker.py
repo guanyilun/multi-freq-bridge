@@ -67,9 +67,9 @@ data_ref = ut.imap_dim_check(enmap.read_map(fname=fname, box=cluster_region))
 data_shape, data_wcs = data_ref.shape, data_ref.wcs
 
 if save_cov: 
-    os.system(f"rm -rf {os.environ['COV_DIR']}/cov_*npy*")
-    # os.system(f"rm -rf {os.environ['COV_DIR']}_ref/cov_*npy*")
-
+    cmd = f"mkdir -p {os.environ['COV_DIR']}"
+    print("clearing cov dir: ", cmd)
+    os.system(cmd)
 
 def process_combo_cov(combo, 
                       geometry=(data_shape, data_wcs), 
@@ -98,57 +98,31 @@ def process_combo_cov(combo,
         data_dir2 = os.getenv("PLANCK_DATADIR")
 
     print("Calculating covariance for: {}".format(combo))
-    # if 0:
-    #     debug_pix_noise = (inst1 == 'planck', inst2 == 'planck')
-    # else:
     debug_pix_noise = (False, False)
 
     mean_tpsd, mean_npsd, mean_spsd, all_regions_npsd, all_regions_spsd = cov.get_covariance(freq1=freq1, 
-                                                                                    freq2=freq2,
+                                                                                             freq2=freq2,
                                                 
-                                                                                    array1=array1, 
-                                                                                    array2=array2,
+                                                                                             array1=array1, 
+                                                                                             array2=array2,
                                                 
-                                                                                    inst1=inst1, 
-                                                                                    inst2=inst2,
+                                                                                             inst1=inst1, 
+                                                                                             inst2=inst2,
                                                 
-                                                                                    data_dir1=data_dir1,
-                                                                                    data_dir2=data_dir2,
+                                                                                             data_dir1=data_dir1,
+                                                                                             data_dir2=data_dir2,
                                                                                     
-                                                                                    data_wcs=geometry[1],
+                                                                                             data_wcs=geometry[1],
                                                                                     
-                                                                                    cf=config_data,
-                                                                                    debug_pix_noise=debug_pix_noise,)
-    # rescale planck noise level below pixel scale such that ACT will dominate in those scales
-    if (inst1 == 'planck' and (combo[0] == combo[1])):
-        print(f"combo = {combo}")
-        
-        modlmap = enmap.modlmap(data_shape, data_wcs)
-        # 1. taking mean power from tpsd in the range 5000-6000
-        if float(freq1) >= 80:
-            limits = [5000, 6000]
-        else:
-            limits = [2000, 3000]
-        m = np.logical_and(modlmap >= limits[0], modlmap <= limits[1])
-        mean_var = np.mean(mean_tpsd[m]).real
-
-        # mean_var = np.inf
-        # mean_var = 1e25
-        print(f"Mean variance: {mean_var:.2e}")
-        m2 = modlmap>limits[1]
-        mean_tpsd[m2] = mean_var
-        mean_tpsd = mean_tpsd + 0j
-        print(mean_tpsd.wcs)
-        print("Fixing planck large ell noise")
-
-    # debug
-    # mean_tpsd = mean_npsd
+                                                                                             cf=config_data,
+                                                                                             debug_pix_noise=debug_pix_noise,)
 
     # apply ell-dependent scaling to the pa4-pa5 noise power spectrum
-    if combo[0] == combo[1] and (array1 in ['pa4', 'pa5']):
-    # if 0:
-        binsize = 200
+    if config_data['cluster_region_noise_rescale'] and (combo[0] == combo[1] and (array1 in ['pa4', 'pa5'])):
+        print(f"Rescaling cluster region noise for {combo[0]}")
         modlmap = enmap.modlmap(data_shape, data_wcs)
+
+        # binsize = 200
         # get the avg noise power spectrum in 1D space from all the regions
         # b_regions, l_regions = [], []
         # for region in all_regions_npsd:
@@ -161,11 +135,11 @@ def process_combo_cov(combo,
         # 1. compute 1d noise power spectrum for each region and average them
         # 2. average the 2d noise power spectrum over all regions and compute 1d noise power spectrum
         # they should be the same for auto cases, when all covariances are 
-
         # b_avg = np.mean(b_regions[:-1], axis=0)
         # l_avg = np.mean(l_regions[:-1], axis=0)
-        mean_npsd_regions = enmap.ndmap(np.mean(all_regions_npsd[:-1], axis=0), wcs=geometry[1])
-        mean_spsd_regions = enmap.ndmap(np.mean(all_regions_spsd[:-1], axis=0), wcs=geometry[1])
+
+        mean_npsd_regions = enmap.ndmap(np.mean(np.abs(all_regions_npsd[:-1]), axis=0), wcs=geometry[1])
+        mean_spsd_regions = enmap.ndmap(np.mean(np.abs(all_regions_spsd[:-1]), axis=0), wcs=geometry[1])
         mean_tpsd_regions = mean_spsd_regions + mean_npsd_regions
         tpsd_cluster = all_regions_npsd[-1] + all_regions_spsd[-1]
 
@@ -204,9 +178,15 @@ def process_combo_cov(combo,
         # scale_factor[modlmap < 4000] = 1
 
         # range we are measuring scaling factor (l>4000)
-        m = (modlmap >= 4000) * (modlmap <= 5000)
+        m = (modlmap >= 6000) * (modlmap <= 8000)
         # scale_factor = np.median(np.abs(tpsd_cluster[m])/np.abs(mean_tpsd_regions[m]))
-        scale_factor = np.median(np.abs(all_regions_npsd[-1][m])/np.abs(mean_npsd_regions[m]))
+        fit_by_tpsd = False
+        fit_by_npsd = True
+        if fit_by_tpsd:
+            scale_factor = np.median(np.abs(tpsd_cluster[m])/np.abs(mean_tpsd_regions[m]))
+        elif fit_by_npsd:
+            scale_factor = np.mean(np.abs(all_regions_npsd[-1][m])/np.abs(mean_npsd_regions[m]))
+        # scale_factor = np.median(np.abs(all_regions_npsd[-1][m])/np.abs(mean_npsd_regions[m]))
         # scale_factor[modlmap >= 4000] =  np.median(np.abs(all_regions_npsd[-1][m])/np.abs(mean_npsd_regions[m]))
         # scale_factors[tuple(combo)] = scale_factor
         # scale_factor = np.round(scale_factor, 4) * 4
@@ -214,13 +194,6 @@ def process_combo_cov(combo,
         # scale only autocase
         # print(f"{tuple(combo)}: {np.min(scale_factor)}")
         print(f"{tuple(combo)}: {scale_factor}")
-
-        # ut.plot_image(image=np.fft.fftshift(scale_factor),
-        #               title="Scale factor",
-        #               stretch='log',
-        #               interval_type='simple_norm')
-
-        # scale_factor = 1
         # scale_factor = scale_factors[tuple(sorted(combo))]
         # print(f"Scale factor: {scale_factor}")
         # print(f"combo: {combo}")
@@ -233,9 +206,10 @@ def process_combo_cov(combo,
         # print(f"{combo}: {scale_factor}")
 
         # corrected 2D noise power spectrum
-        mean_npsd = np.mean(all_regions_npsd[:-1], axis=0) * scale_factor
         # mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
-        mean_tpsd = mean_spsd + mean_npsd
+        m = modlmap > 3000
+        mean_tpsd = mean_tpsd_regions
+        mean_tpsd[m] *= scale_factor
         # mean_tpsd = mean_tpsd_regions * scale_factor 
         # mean_tpsd = mean_npsd
 
@@ -243,21 +217,41 @@ def process_combo_cov(combo,
         # b_center_fit, l_center_fit = enmap.lbin(map=np.abs(npsd_center_fit), bsize=binsize)
         # b_regions_fit, l_regions_fit = enmap.lbin(map=np.abs(npsd_2d_regions_fit), bsize=binsize)
 
-        # plt.loglog(l_avg, b_avg, label="Average noise power spectrum")
-        # plt.loglog(l_npsd_center, b_npsd_center, label="Center noise power spectrum")
-        # plt.loglog(l_scaled, b_scaled, label="Scaled noise power spectrum")
-        # # plt.loglog(l_center_fit, b_center_fit, label="Center noise power spectrum fit")
-        # # plt.loglog(l_regions_fit, b_regions_fit, label="Average noise power spectrum fit")
-        # plt.legend()
-        # plt.grid()
-        # plt.show()
-
         if config_data['smooth_total']:
             print("Smoothing total power spectrum")
             mean_tpsd = gaussian_filter(input=mean_tpsd, sigma=config_data['smooth_total_pix'])
             mean_tpsd = enmap.ndmap(np.array(mean_tpsd), wcs=data_wcs)
 
+    # rescale planck noise level below pixel scale such that ACT will dominate in those scales
+    if config_data['whiten_planck']:
+        if (inst1 == 'planck' and (combo[0] == combo[1])):
+            modlmap = enmap.modlmap(data_shape, data_wcs)
+            # 1. taking mean power from tpsd in the range 5000-6000
+            if float(freq1) >= 80:
+                limits = [5000, 6000]
+            else:
+                limits = [2000, 3000]
+            m = np.logical_and(modlmap >= limits[0], modlmap <= limits[1])
+            mean_var = np.mean(np.abs(mean_tpsd[m]))
+            m2 = modlmap>limits[1]
+            mean_tpsd[m2] = mean_var
+            mean_tpsd = mean_tpsd + 0j
+            print(f"whitening {combo} large ell noise with {mean_var:.2e}")
+
+    if config_data['whiten_act']:
+        if (inst1 == 'act' and (combo[0] == combo[1])):
+            modlmap = enmap.modlmap(data_shape, data_wcs)
+            # 1. taking mean power from tpsd in the range 5000-6000
+            limits = [6000, 8000]
+            m = np.logical_and(modlmap >= limits[0], modlmap <= limits[1])
+            mean_var = np.mean(np.abs(mean_tpsd[m]))
+            m = modlmap>limits[0]
+            mean_tpsd[m] = mean_var
+            mean_tpsd = mean_tpsd + 0j
+            print(f"whitening {combo} large ell noise with {mean_var:.2e}")
+
     if plot_1d:
+        binsize = 200
         b_npsd, l_npsd = enmap.lbin(map=np.abs(mean_npsd), bsize=binsize)
         b_tpsd, l_tpsd = enmap.lbin(map=np.abs(mean_tpsd), bsize=binsize)
         b_spsd, l_spsd = enmap.lbin(map=np.abs(mean_spsd), bsize=binsize)
@@ -277,7 +271,9 @@ def process_combo_cov(combo,
 
     if save_cov:
         # np.save(file=f"{os.environ['COV_DIR']}_ref/cov_{freq1}_{array1}_{inst1}_{scan1}_{freq2}_{array2}_{inst2}_{scan2}.npy", arr=mean_tpsd)
-        np.save(file=f"{os.environ['COV_DIR']}/cov_{freq1}_{array1}_{inst1}_{scan1}_{freq2}_{array2}_{inst2}_{scan2}.npy", arr=mean_tpsd)
+        ofile = f"{os.environ['COV_DIR']}/cov_{freq1}_{array1}_{inst1}_{scan1}_{freq2}_{array2}_{inst2}_{scan2}.npy"
+        print(f"Saving covariance to {ofile}")
+        np.save(file=ofile, arr=mean_tpsd)
 
 
 combos = list(itertools.product(config_data['data'], config_data['data']))

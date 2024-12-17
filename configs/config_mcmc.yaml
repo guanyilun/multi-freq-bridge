@@ -11,8 +11,8 @@ c1_dec: 13.594
 
 c1_ra_min: 44.73
 c1_ra_max: 44.75
-c1_dec_min: 13.5
-c1_dec_max: 13.65
+c1_dec_min: 13.583
+c1_dec_max: 13.598
 c1_muo: -0.5566122489553409
 c1_beta_min: 0.1
 c1_beta_max: 2
@@ -33,16 +33,16 @@ c1_Dtau_max: 0.02
 c1_A_D_min: 0
 c1_A_D_max: 1000000
 # Cluster 2
-c2_ra: 44.473  # hincks et al.
-c2_dec: 13.03
+#c2_ra: 44.473
+#c2_dec: 13.03
 
-# c2_ra: 44.464
-# c2_dec: 13.0328
+c2_ra: 44.464
+c2_dec: 13.0328
 
-c2_ra_min: 44.42
-c2_ra_max: 44.52
-c2_dec_min: 12.98
-c2_dec_max: 13.09
+c2_ra_min: 44.449
+c2_ra_max: 44.487
+c2_dec_min: 13.02
+c2_dec_max: 13.05
 
 c2_muo: -0.5606024845891494
 c2_beta_min: 0.1
@@ -68,8 +68,8 @@ fil_ra: 44.68
 fil_dec: 13.37
 fil_ra_min: 44.58
 fil_ra_max: 44.78
-fil_dec_min: 13.3
-fil_dec_max: 13.42
+fil_dec_min: 13.2
+fil_dec_max: 13.47
 fil_z: 0.072735
 fil_muo: -0.5576451231598584
 fil_z: 0.072735
@@ -112,8 +112,10 @@ smooth_total_type: gaussian
 smooth_signal_pix: 1.25
 smooth_noise_pix: 1.25
 smooth_total_pix: 1.25 # pixels the sigma
-min_ell_fit: 500 # For the minimum ell to fit the data for smoothing the noise cov
-# Miscellaneaus parameters
+whiten_planck: True
+whiten_act: True
+cluster_region_noise_rescale: True
+apply_region_weight: True
 temp_model_type: isothermal
 repeat_h5: "true"
 data:
@@ -121,13 +123,13 @@ data:
   - 220_pa4_act_dr6v2
   - 150_pa5_act_dr6v2
   - 98_pa5_act_dr6v2
-  # - 98_pa6_act_dr6v2
-  # - 150_pa6_act_dr6v2
+  - 98_pa6_act_dr6v2
+  - 150_pa6_act_dr6v2
   # - 30_npipe_planck_sky
   # - 44_npipe_planck_sky
   # - 70_npipe_planck_sky
   - 100_npipe_planck_sky
   - 143_npipe_planck_sky
   - 217_npipe_planck_sky
-  # - 353_npipe_planck_sky
+  - 353_npipe_planck_sky
   # - 545_npipe_planck_sky

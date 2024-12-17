@@ -70,7 +70,7 @@ def get_covariance(freq1,
 
     ivars1 = np.sort(glob(ivars1_str))
     ivars2 = np.sort(glob(ivars2_str))
-    
+
     # We want the coadd maps to be in Jy/sr
     # We want the ivar maps to be in 1 / (Jy/sr)^2
     flux_factor1 = ut.flux_factor(array1, freq1) # Jy/uK/sr
@@ -81,11 +81,32 @@ def get_covariance(freq1,
 
     all_regions_npsd, all_regions_spsd = [], []
 
+    if cf['apply_region_weight']:
+        print("Applying region weights.")
+        ivarc1_str = f"{data_dir1}*{array1}*{freq1}*coadd*ivar.fits"
+        ivarc2_str = f"{data_dir2}*{array2}*{freq2}*coadd*ivar.fits"
+        ivarc1 = np.sort(glob(ivarc1_str))
+        ivarc2 = np.sort(glob(ivarc2_str))
+        # computing weights per region for combining the noise power spectra across regions
+        coadd1_ivar_list, coadd2_ivar_list = [], []
+        for _, region in enumerate(regions):
+            coadd1_ivar = ut.imap_dim_check(enmap.read_map(ivarc1[0], box=region)) / flux_factor1**2
+            coadd2_ivar = ut.imap_dim_check(enmap.read_map(ivarc2[0], box=region)) / flux_factor2**2
+            coadd1_ivar_list.append(coadd1_ivar)
+            coadd2_ivar_list.append(coadd2_ivar)
+        sum_coadd1_ivar = np.sum(coadd1_ivar_list[:-1], axis=0)
+        sum_coadd2_ivar = np.sum(coadd2_ivar_list[:-1], axis=0)
+
     # Loop over all regions (now regular noise and signal cov calculations)
     for _, region in enumerate(regions):
 
         coadd1_map = ut.imap_dim_check(enmap.read_map(coadd1[0], box=region)) * flux_factor1
         coadd2_map = ut.imap_dim_check(enmap.read_map(coadd2[0], box=region)) * flux_factor2
+
+        if cf['apply_region_weight']:
+            coadd1_ivar = ut.imap_dim_check(enmap.read_map(ivarc1[0], box=region)) / flux_factor1**2
+            coadd2_ivar = ut.imap_dim_check(enmap.read_map(ivarc2[0], box=region)) / flux_factor2**2
+            region_weight = np.mean(coadd1_ivar * coadd2_ivar / (sum_coadd1_ivar*sum_coadd2_ivar))
 
         ivars1_list, ivars2_list = [], []
         
@@ -175,6 +196,8 @@ def get_covariance(freq1,
 
             npsd = (1/(max_split_number*(max_split_number-1))) * np.sum(noise_all_splits_loop, axis=0)
 
+            if cf['apply_region_weight']:
+                npsd *= region_weight
             all_regions_npsd.append(enmap.ndmap(np.array(npsd), wcs=data_wcs))
         
         else:
@@ -192,22 +215,22 @@ def get_covariance(freq1,
 
         spsd = coadd1_map_norm * np.conjugate(coadd2_map_norm) / np.mean(apod_mask1 * apod_mask2)
 
+        if cf['apply_region_weight']:
+            spsd *= region_weight
+
         # Subtract the noise covariance from the signal cov from each region
         if (noise_type_bool): 
             spsd -= npsd
-        
         all_regions_spsd.append(enmap.ndmap(np.array(spsd), wcs=data_wcs))
 
     # average over all except the last region
-    mean_spsd = np.mean(all_regions_spsd[:-1], axis=0)
+    if cf['apply_region_weight']:
+        mean_spsd = np.sum(all_regions_spsd[:-1], axis=0)
+        mean_npsd = np.sum(all_regions_npsd[:-1], axis=0)
+    else:
+        mean_spsd = np.mean(all_regions_spsd[:-1], axis=0)
+        mean_npsd = np.mean(all_regions_npsd[:-1], axis=0)
     mean_spsd = enmap.ndmap(np.array(mean_spsd), wcs=data_wcs)
-
-    # average over all regions except the last region
-    mean_npsd = np.mean(all_regions_npsd[:-1], axis=0)
-
-    # use the cluster center region for the noise
-    # mean_npsd = all_regions_npsd[-1]
-    # mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
 
     if cf['rad_avg_noise']:
         mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
@@ -238,7 +261,7 @@ def get_covariance(freq1,
         mean_tpsd_cluster = real_rad_tpsd_cluster + 1.j*imag_rad_tpsd_cluster
 
     if cf['smooth_total']:
-        print("Smoothing the total power spectrum.")
+        print(f"Smoothing tpsd: {cf['smooth_total_pix']} pix.")
         mean_tpsd_cluster = gaussian_filter(input=mean_tpsd_cluster, sigma=cf['smooth_total_pix'])
     
     # mean_tpsd_cluster = np.abs(mean_tpsd_cluster)
