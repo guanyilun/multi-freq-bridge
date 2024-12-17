@@ -206,8 +206,8 @@ def get_covariance(freq1,
     mean_npsd = np.mean(all_regions_npsd[:-1], axis=0)
 
     # use the cluster center region for the noise
-    # mean_npsd = all_regions_npsd[-1]
-    # mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
+    #mean_npsd = all_regions_npsd[-1]
+    mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
 
     if cf['rad_avg_noise']:
         mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
@@ -248,275 +248,275 @@ def get_covariance(freq1,
 
     return mean_tpsd_cluster, mean_npsd, mean_spsd, all_regions_npsd, all_regions_spsd
 
-def get_covariance_sample(freq1, 
-                            freq2, 
-                            array1, 
-                            array2, 
-                            inst1, 
-                            inst2,
-                            data_wcs, 
-                            data_dir1, 
-                            data_dir2,
-                            cf):
+# def get_covariance_sample(freq1, 
+#                             freq2, 
+#                             array1, 
+#                             array2, 
+#                             inst1, 
+#                             inst2,
+#                             data_wcs, 
+#                             data_dir1, 
+#                             data_dir2,
+#                             cf):
 
-    regions = ut.get_all_regions(region_center_ra=cf['region_center_ra'],
-                                 region_center_dec=cf['region_center_dec'],
-                                 region_width=cf['region_width'])
+#     regions = ut.get_all_regions(region_center_ra=cf['region_center_ra'],
+#                                  region_center_dec=cf['region_center_dec'],
+#                                  region_width=cf['region_width'])
     
-    data_str_flag = sim_check(cf)
+#     data_str_flag = sim_check(cf)
     
-    # File names
-    splits1_str = f"{data_dir1}*{array1}*{freq1}*set*map{data_str_flag}.fits"
-    splits2_str = f"{data_dir2}*{array2}*{freq2}*set*map{data_str_flag}.fits"
+#     # File names
+#     splits1_str = f"{data_dir1}*{array1}*{freq1}*set*map{data_str_flag}.fits"
+#     splits2_str = f"{data_dir2}*{array2}*{freq2}*set*map{data_str_flag}.fits"
 
-    splits1 = np.sort(glob(splits1_str))
-    splits2 = np.sort(glob(splits2_str))
+#     splits1 = np.sort(glob(splits1_str))
+#     splits2 = np.sort(glob(splits2_str))
 
-    coadd1_str = f"{data_dir1}*{array1}*{freq1}*coadd*map{data_str_flag}.fits"
-    coadd2_str = f"{data_dir2}*{array2}*{freq2}*coadd*map{data_str_flag}.fits"
+#     coadd1_str = f"{data_dir1}*{array1}*{freq1}*coadd*map{data_str_flag}.fits"
+#     coadd2_str = f"{data_dir2}*{array2}*{freq2}*coadd*map{data_str_flag}.fits"
 
-    coadd1 = np.sort(glob(coadd1_str))
-    coadd2 = np.sort(glob(coadd2_str))
+#     coadd1 = np.sort(glob(coadd1_str))
+#     coadd2 = np.sort(glob(coadd2_str))
 
-    ivars1_str = f"{data_dir1}*{array1}*{freq1}*set*ivar.fits"
-    ivars2_str = f"{data_dir2}*{array2}*{freq2}*set*ivar.fits"
+#     ivars1_str = f"{data_dir1}*{array1}*{freq1}*set*ivar.fits"
+#     ivars2_str = f"{data_dir2}*{array2}*{freq2}*set*ivar.fits"
 
-    ivars1 = np.sort(glob(ivars1_str))
-    ivars2 = np.sort(glob(ivars2_str))
+#     ivars1 = np.sort(glob(ivars1_str))
+#     ivars2 = np.sort(glob(ivars2_str))
 
-    # We want the coadd maps to be in Jy/sr
-    # We want the ivar maps to be in 1 / (Jy/sr)^2
-    flux_factor1 = ut.flux_factor(array1, freq1) # Jy/uK/sr
-    flux_factor2 = ut.flux_factor(array2, freq2) # Jy/uK/sr
+#     # We want the coadd maps to be in Jy/sr
+#     # We want the ivar maps to be in 1 / (Jy/sr)^2
+#     flux_factor1 = ut.flux_factor(array1, freq1) # Jy/uK/sr
+#     flux_factor2 = ut.flux_factor(array2, freq2) # Jy/uK/sr
 
-    if len(coadd1) == 0 or len(coadd2) == 0: 
-        raise ValueError("Length of coadded maps is zero.")
+#     if len(coadd1) == 0 or len(coadd2) == 0: 
+#         raise ValueError("Length of coadded maps is zero.")
 
-    all_regions_npsd, all_regions_spsd = [], []
+#     all_regions_npsd, all_regions_spsd = [], []
 
-    noise_type_bool = False
-    max_split_number = min(len(splits1), len(splits2))
+#     noise_type_bool = False
+#     max_split_number = min(len(splits1), len(splits2))
 
-    # Loop over all regions (now regular noise and signal cov calculations)
-    for _, region in enumerate(regions):
+#     # Loop over all regions (now regular noise and signal cov calculations)
+#     for _, region in enumerate(regions):
 
-        coadd1_map = ut.imap_dim_check(enmap.read_map(coadd1[0], box=region)) * flux_factor1
-        coadd2_map = ut.imap_dim_check(enmap.read_map(coadd2[0], box=region)) * flux_factor2
+#         coadd1_map = ut.imap_dim_check(enmap.read_map(coadd1[0], box=region)) * flux_factor1
+#         coadd2_map = ut.imap_dim_check(enmap.read_map(coadd2[0], box=region)) * flux_factor2
 
-        ivars1_list, ivars2_list = [], []
+#         ivars1_list, ivars2_list = [], []
         
-        for j in range(len(ivars1)):
-            ivar_map1 = ut.imap_dim_check(enmap.read_map(ivars1[j], box=region)) / flux_factor1**2
-            ivars1_list.append(ivar_map1)
+#         for j in range(len(ivars1)):
+#             ivar_map1 = ut.imap_dim_check(enmap.read_map(ivars1[j], box=region)) / flux_factor1**2
+#             ivars1_list.append(ivar_map1)
 
-        for j in range(len(ivars2)):
-            ivar_map2 = ut.imap_dim_check(enmap.read_map(ivars2[j], box=region)) / flux_factor2**2
-            ivars2_list.append(ivar_map2)
+#         for j in range(len(ivars2)):
+#             ivar_map2 = ut.imap_dim_check(enmap.read_map(ivars2[j], box=region)) / flux_factor2**2
+#             ivars2_list.append(ivar_map2)
 
-        sum_ivar1 = np.sum(ivars1_list, axis=0)
-        sum_ivar2 = np.sum(ivars2_list, axis=0)
+#         sum_ivar1 = np.sum(ivars1_list, axis=0)
+#         sum_ivar2 = np.sum(ivars2_list, axis=0)
 
-        # NOISE COVARIANCE
-        noise_all_splits_loop = []
+#         # NOISE COVARIANCE
+#         noise_all_splits_loop = []
        
-        if cf['noise_type'] == 'all':  # Calc noise cov for all arrays
-            noise_type_bool = True
-        elif cf['noise_type'] == 'inst':  # Calc noise cov for same instruments only
-            noise_type_bool = (inst1 == inst2)
-        elif cf['noise_type'] == 'array':  # Calc noise cov for same arrays only
-            noise_type_bool = (array1 == array2)
-        elif cf['noise_type'] == 'array_freq':  # Calc noise cov for same arrays only
-            noise_type_bool = (array1 == array2) and (freq1 == freq2)
-        else: 
-            raise ValueError("Invalid noise covariance type.")
+#         if cf['noise_type'] == 'all':  # Calc noise cov for all arrays
+#             noise_type_bool = True
+#         elif cf['noise_type'] == 'inst':  # Calc noise cov for same instruments only
+#             noise_type_bool = (inst1 == inst2)
+#         elif cf['noise_type'] == 'array':  # Calc noise cov for same arrays only
+#             noise_type_bool = (array1 == array2)
+#         elif cf['noise_type'] == 'array_freq':  # Calc noise cov for same arrays only
+#             noise_type_bool = (array1 == array2) and (freq1 == freq2)
+#         else: 
+#             raise ValueError("Invalid noise covariance type.")
 
-        if noise_type_bool:
-            for idx_split in range(max_split_number):
+#         if noise_type_bool:
+#             for idx_split in range(max_split_number):
                 
-                split1 = ut.imap_dim_check(enmap.read_map(splits1[idx_split], box=region)) * flux_factor1
-                split2 = ut.imap_dim_check(enmap.read_map(splits2[idx_split], box=region)) * flux_factor2
+#                 split1 = ut.imap_dim_check(enmap.read_map(splits1[idx_split], box=region)) * flux_factor1
+#                 split2 = ut.imap_dim_check(enmap.read_map(splits2[idx_split], box=region)) * flux_factor2
 
-                ivar1 = ut.imap_dim_check(enmap.read_map(ivars1[idx_split], box=region)) / flux_factor1**2
-                ivar2 = ut.imap_dim_check(enmap.read_map(ivars2[idx_split], box=region)) / flux_factor2**2
+#                 ivar1 = ut.imap_dim_check(enmap.read_map(ivars1[idx_split], box=region)) / flux_factor1**2
+#                 ivar2 = ut.imap_dim_check(enmap.read_map(ivars2[idx_split], box=region)) / flux_factor2**2
 
-                diff1 = split1 - coadd1_map
-                diff2 = split2 - coadd2_map
+#                 diff1 = split1 - coadd1_map
+#                 diff2 = split2 - coadd2_map
 
-                ivar1_norm = ivar1 / sum_ivar1
-                ivar2_norm = ivar2 / sum_ivar2
+#                 ivar1_norm = ivar1 / sum_ivar1
+#                 ivar2_norm = ivar2 / sum_ivar2
 
-                diff1_norm = diff1 * ivar1_norm
-                diff2_norm = diff2 * ivar2_norm
+#                 diff1_norm = diff1 * ivar1_norm
+#                 diff2_norm = diff2 * ivar2_norm
 
-                apod_mask1 = (enmap.apod(diff1_norm*0+1, cf['apod_pix']))
-                diff1_apod = diff1_norm * apod_mask1
+#                 apod_mask1 = (enmap.apod(diff1_norm*0+1, cf['apod_pix']))
+#                 diff1_apod = diff1_norm * apod_mask1
 
-                apod_mask2 = (enmap.apod(diff2_norm*0+1, cf['apod_pix']))
-                diff2_apod = diff2_norm * apod_mask2
+#                 apod_mask2 = (enmap.apod(diff2_norm*0+1, cf['apod_pix']))
+#                 diff2_apod = diff2_norm * apod_mask2
 
-                diff1_fft = np.fft.fft2(diff1_apod)
-                diff2_fft = np.fft.fft2(diff2_apod)
+#                 diff1_fft = np.fft.fft2(diff1_apod)
+#                 diff2_fft = np.fft.fft2(diff2_apod)
 
-                weight = np.mean(ivar1_norm * apod_mask1 * ivar2_norm * apod_mask2)
+#                 weight = np.mean(ivar1_norm * apod_mask1 * ivar2_norm * apod_mask2)
 
-                npsd_region = diff1_fft * np.conjugate(diff2_fft) / weight
+#                 npsd_region = diff1_fft * np.conjugate(diff2_fft) / weight
 
-                noise_all_splits_loop.append(npsd_region)
+#                 noise_all_splits_loop.append(npsd_region)
 
-            npsd = (1/(max_split_number*(max_split_number-1))) * np.sum(noise_all_splits_loop, axis=0)
+#             npsd = (1/(max_split_number*(max_split_number-1))) * np.sum(noise_all_splits_loop, axis=0)
 
-            all_regions_npsd.append(enmap.ndmap(np.array(npsd), wcs=data_wcs))
+#             all_regions_npsd.append(enmap.ndmap(np.array(npsd), wcs=data_wcs))
         
-        else:
-            npsd = np.zeros_like(coadd1_map)
-            all_regions_npsd.append(enmap.ndmap(np.array(npsd), wcs=data_wcs))
+#         else:
+#             npsd = np.zeros_like(coadd1_map)
+#             all_regions_npsd.append(enmap.ndmap(np.array(npsd), wcs=data_wcs))
 
-        # SIGNAL COVARIANCE
-        apod_mask1 = (enmap.apod(coadd1_map*0+1, cf['apod_pix']))
-        coadd1_map_apod = coadd1_map * apod_mask1
-        coadd1_map_norm = np.fft.fft2(coadd1_map_apod) 
+#         # SIGNAL COVARIANCE
+#         apod_mask1 = (enmap.apod(coadd1_map*0+1, cf['apod_pix']))
+#         coadd1_map_apod = coadd1_map * apod_mask1
+#         coadd1_map_norm = np.fft.fft2(coadd1_map_apod) 
 
-        apod_mask2 = (enmap.apod(coadd2_map*0+1, cf['apod_pix']))
-        coadd2_map_apod = coadd2_map * apod_mask2
-        coadd2_map_norm = np.fft.fft2(coadd2_map_apod) 
+#         apod_mask2 = (enmap.apod(coadd2_map*0+1, cf['apod_pix']))
+#         coadd2_map_apod = coadd2_map * apod_mask2
+#         coadd2_map_norm = np.fft.fft2(coadd2_map_apod) 
 
-        spsd = coadd1_map_norm * np.conjugate(coadd2_map_norm) / np.mean(apod_mask1 * apod_mask2)
+#         spsd = coadd1_map_norm * np.conjugate(coadd2_map_norm) / np.mean(apod_mask1 * apod_mask2)
 
-        # Subtract the noise covariance from the signal cov from each region
-        if (noise_type_bool): 
-            spsd -= npsd
+#         # Subtract the noise covariance from the signal cov from each region
+#         if (noise_type_bool): 
+#             spsd -= npsd
         
-        all_regions_spsd.append(enmap.ndmap(np.array(spsd), wcs=data_wcs))
+#         all_regions_spsd.append(enmap.ndmap(np.array(spsd), wcs=data_wcs))
 
-    # Noise covariance over the central region with random shifts
-    # This is to get a better estimate of the noise covariance
-    npsd_list = []
+#     # Noise covariance over the central region with random shifts
+#     # This is to get a better estimate of the noise covariance
+#     npsd_list = []
 
-    if noise_type_bool:
-        iterations = 100
-        play_degrees = 0.5
+#     if noise_type_bool:
+#         iterations = 100
+#         play_degrees = 0.5
 
-        for idx in range(iterations):
-            region_center_ra =  cf['region_center_ra'] + np.random.uniform(-play_degrees, play_degrees)
-            region_center_dec = cf['region_center_dec'] + np.random.uniform(-play_degrees, play_degrees)
-            region_width = cf['region_width']
+#         for idx in range(iterations):
+#             region_center_ra =  cf['region_center_ra'] + np.random.uniform(-play_degrees, play_degrees)
+#             region_center_dec = cf['region_center_dec'] + np.random.uniform(-play_degrees, play_degrees)
+#             region_width = cf['region_width']
 
-            region = ut.get_region(region_center_ra=region_center_ra,
-                                region_center_dec=region_center_dec,
-                                region_width=region_width)    
+#             region = ut.get_region(region_center_ra=region_center_ra,
+#                                 region_center_dec=region_center_dec,
+#                                 region_width=region_width)    
 
-            coadd1_map = ut.imap_dim_check(enmap.read_map(coadd1[0], box=region)) * flux_factor1
-            coadd2_map = ut.imap_dim_check(enmap.read_map(coadd2[0], box=region)) * flux_factor2
+#             coadd1_map = ut.imap_dim_check(enmap.read_map(coadd1[0], box=region)) * flux_factor1
+#             coadd2_map = ut.imap_dim_check(enmap.read_map(coadd2[0], box=region)) * flux_factor2
 
-            ivars1_list, ivars2_list = [], []
+#             ivars1_list, ivars2_list = [], []
 
-            for j in range(len(ivars1)):
-                ivar_map1 = ut.imap_dim_check(enmap.read_map(ivars1[j], box=region)) / flux_factor1**2
-                ivars1_list.append(ivar_map1)
+#             for j in range(len(ivars1)):
+#                 ivar_map1 = ut.imap_dim_check(enmap.read_map(ivars1[j], box=region)) / flux_factor1**2
+#                 ivars1_list.append(ivar_map1)
 
-            for j in range(len(ivars2)):
-                ivar_map2 = ut.imap_dim_check(enmap.read_map(ivars2[j], box=region)) / flux_factor2**2
-                ivars2_list.append(ivar_map2)
+#             for j in range(len(ivars2)):
+#                 ivar_map2 = ut.imap_dim_check(enmap.read_map(ivars2[j], box=region)) / flux_factor2**2
+#                 ivars2_list.append(ivar_map2)
 
-            sum_ivar1 = np.sum(ivars1_list, axis=0)
-            sum_ivar2 = np.sum(ivars2_list, axis=0)
+#             sum_ivar1 = np.sum(ivars1_list, axis=0)
+#             sum_ivar2 = np.sum(ivars2_list, axis=0)
 
-            noise_all_splits_loop = []
+#             noise_all_splits_loop = []
 
-            for idx_split in range(max_split_number):
+#             for idx_split in range(max_split_number):
                     
-                    split1 = ut.imap_dim_check(enmap.read_map(splits1[idx_split], 
-                                                              box=region)) * flux_factor1
-                    split2 = ut.imap_dim_check(enmap.read_map(splits2[idx_split], 
-                                                              box=region)) * flux_factor2
+#                     split1 = ut.imap_dim_check(enmap.read_map(splits1[idx_split], 
+#                                                               box=region)) * flux_factor1
+#                     split2 = ut.imap_dim_check(enmap.read_map(splits2[idx_split], 
+#                                                               box=region)) * flux_factor2
     
-                    ivar1 = ut.imap_dim_check(enmap.read_map(ivars1[idx_split], 
-                                                             box=region)) / flux_factor1**2
-                    ivar2 = ut.imap_dim_check(enmap.read_map(ivars2[idx_split], 
-                                                             box=region)) / flux_factor2**2
+#                     ivar1 = ut.imap_dim_check(enmap.read_map(ivars1[idx_split], 
+#                                                              box=region)) / flux_factor1**2
+#                     ivar2 = ut.imap_dim_check(enmap.read_map(ivars2[idx_split], 
+#                                                              box=region)) / flux_factor2**2
     
-                    diff1 = split1 - coadd1_map
-                    diff2 = split2 - coadd2_map
+#                     diff1 = split1 - coadd1_map
+#                     diff2 = split2 - coadd2_map
     
-                    ivar1_norm = ivar1 / sum_ivar1
-                    ivar2_norm = ivar2 / sum_ivar2
+#                     ivar1_norm = ivar1 / sum_ivar1
+#                     ivar2_norm = ivar2 / sum_ivar2
     
-                    diff1_norm = diff1 * ivar1_norm
-                    diff2_norm = diff2 * ivar2_norm
+#                     diff1_norm = diff1 * ivar1_norm
+#                     diff2_norm = diff2 * ivar2_norm
     
-                    apod_mask1 = (enmap.apod(diff1_norm*0+1, cf['apod_pix']))
-                    diff1_apod = diff1_norm * apod_mask1
+#                     apod_mask1 = (enmap.apod(diff1_norm*0+1, cf['apod_pix']))
+#                     diff1_apod = diff1_norm * apod_mask1
     
-                    apod_mask2 = (enmap.apod(diff2_norm*0+1, cf['apod_pix']))
-                    diff2_apod = diff2_norm * apod_mask2
+#                     apod_mask2 = (enmap.apod(diff2_norm*0+1, cf['apod_pix']))
+#                     diff2_apod = diff2_norm * apod_mask2
     
-                    diff1_fft = np.fft.fft2(diff1_apod)
-                    diff2_fft = np.fft.fft2(diff2_apod)
+#                     diff1_fft = np.fft.fft2(diff1_apod)
+#                     diff2_fft = np.fft.fft2(diff2_apod)
     
-                    weight = np.mean(ivar1_norm * apod_mask1 * ivar2_norm * apod_mask2)
+#                     weight = np.mean(ivar1_norm * apod_mask1 * ivar2_norm * apod_mask2)
     
-                    npsd_region = diff1_fft * np.conjugate(diff2_fft) / weight
+#                     npsd_region = diff1_fft * np.conjugate(diff2_fft) / weight
 
-                    noise_all_splits_loop.append(npsd_region)
+#                     noise_all_splits_loop.append(npsd_region)
             
-            npsd = (1/(max_split_number*(max_split_number-1))) * np.sum(noise_all_splits_loop, axis=0)
-            npsd = enmap.ndmap(np.array(npsd), wcs=data_wcs)
-            npsd_list.append(npsd)
+#             npsd = (1/(max_split_number*(max_split_number-1))) * np.sum(noise_all_splits_loop, axis=0)
+#             npsd = enmap.ndmap(np.array(npsd), wcs=data_wcs)
+#             npsd_list.append(npsd)
 
-    else:
-        npsd = np.zeros_like(coadd1_map)
-        npsd_list.append(enmap.ndmap(np.array(npsd), wcs=data_wcs))
+#     else:
+#         npsd = np.zeros_like(coadd1_map)
+#         npsd_list.append(enmap.ndmap(np.array(npsd), wcs=data_wcs))
     
-    mean_npsd_iterators = np.mean(npsd_list, axis=0)
-    mean_npsd_iterators = enmap.ndmap(np.array(mean_npsd_iterators), wcs=data_wcs)
+#     mean_npsd_iterators = np.mean(npsd_list, axis=0)
+#     mean_npsd_iterators = enmap.ndmap(np.array(mean_npsd_iterators), wcs=data_wcs)
 
-    mean_spsd = np.mean(all_regions_spsd[:-1], axis=0)
-    mean_spsd = enmap.ndmap(np.array(mean_spsd), wcs=data_wcs)
+#     mean_spsd = np.mean(all_regions_spsd[:-1], axis=0)
+#     mean_spsd = enmap.ndmap(np.array(mean_spsd), wcs=data_wcs)
 
-    # debug
-    #mean_npsd = np.mean(all_regions_npsd[:-1], axis=0)
-    mean_npsd = all_regions_npsd[-1]
-    mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
+#     # debug
+#     #mean_npsd = np.mean(all_regions_npsd[:-1], axis=0)
+#     mean_npsd = all_regions_npsd[-1]
+#     mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
 
-    if cf['rad_avg_noise']:
-        mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
-        real_rad_npsd_cluster = ut.rad_avg_2d(image=np.real(mean_npsd), bsize=cf['rad_avg_bsize'])
-        imag_rad_npsd_cluster = ut.rad_avg_2d(image=np.imag(mean_npsd), bsize=cf['rad_avg_bsize'])
-        mean_npsd = real_rad_npsd_cluster + 1.j*imag_rad_npsd_cluster
+#     if cf['rad_avg_noise']:
+#         mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
+#         real_rad_npsd_cluster = ut.rad_avg_2d(image=np.real(mean_npsd), bsize=cf['rad_avg_bsize'])
+#         imag_rad_npsd_cluster = ut.rad_avg_2d(image=np.imag(mean_npsd), bsize=cf['rad_avg_bsize'])
+#         mean_npsd = real_rad_npsd_cluster + 1.j*imag_rad_npsd_cluster
 
-    if cf['rad_avg_signal']:
-        mean_spsd = enmap.ndmap(np.array(mean_spsd), wcs=data_wcs)
-        real_rad_spsd_cluster = ut.rad_avg_2d(image=np.real(mean_spsd), bsize=cf['rad_avg_bsize'])
-        imag_rad_spsd_cluster = ut.rad_avg_2d(image=np.imag(mean_spsd), bsize=cf['rad_avg_bsize'])
-        mean_spsd = real_rad_spsd_cluster + 1.j*imag_rad_spsd_cluster
+#     if cf['rad_avg_signal']:
+#         mean_spsd = enmap.ndmap(np.array(mean_spsd), wcs=data_wcs)
+#         real_rad_spsd_cluster = ut.rad_avg_2d(image=np.real(mean_spsd), bsize=cf['rad_avg_bsize'])
+#         imag_rad_spsd_cluster = ut.rad_avg_2d(image=np.imag(mean_spsd), bsize=cf['rad_avg_bsize'])
+#         mean_spsd = real_rad_spsd_cluster + 1.j*imag_rad_spsd_cluster
 
-    if cf['smooth_noise']:
-        # mean_npsd = gaussian_filter(input=mean_npsd, sigma=cf['smooth_noise_pix'])
-        mean_npsd_iterators = gaussian_filter(input=mean_npsd_iterators, sigma=cf['smooth_noise_pix'])
+#     if cf['smooth_noise']:
+#         # mean_npsd = gaussian_filter(input=mean_npsd, sigma=cf['smooth_noise_pix'])
+#         mean_npsd_iterators = gaussian_filter(input=mean_npsd_iterators, sigma=cf['smooth_noise_pix'])
 
-    if cf['smooth_signal']:
-        mean_spsd = gaussian_filter(input=mean_spsd, sigma=cf['smooth_signal_pix'])
+#     if cf['smooth_signal']:
+#         mean_spsd = gaussian_filter(input=mean_spsd, sigma=cf['smooth_signal_pix'])
     
-    # mean_tpsd_cluster = mean_spsd + mean_npsd
-    mean_tpsd_cluster = mean_spsd + mean_npsd_iterators
+#     # mean_tpsd_cluster = mean_spsd + mean_npsd
+#     mean_tpsd_cluster = mean_spsd + mean_npsd_iterators
 
-    if cf['rad_avg_total']:
-        mean_tpsd_cluster = enmap.ndmap(np.array(mean_tpsd_cluster), wcs=data_wcs)
-        real_rad_tpsd_cluster = ut.rad_avg_2d(image=np.real(mean_tpsd_cluster), 
-                                              bsize=cf['rad_avg_bsize'])
-        imag_rad_tpsd_cluster = ut.rad_avg_2d(image=np.imag(mean_tpsd_cluster), 
-                                              bsize=cf['rad_avg_bsize'])
-        mean_tpsd_cluster = real_rad_tpsd_cluster + 1.j*imag_rad_tpsd_cluster
+#     if cf['rad_avg_total']:
+#         mean_tpsd_cluster = enmap.ndmap(np.array(mean_tpsd_cluster), wcs=data_wcs)
+#         real_rad_tpsd_cluster = ut.rad_avg_2d(image=np.real(mean_tpsd_cluster), 
+#                                               bsize=cf['rad_avg_bsize'])
+#         imag_rad_tpsd_cluster = ut.rad_avg_2d(image=np.imag(mean_tpsd_cluster), 
+#                                               bsize=cf['rad_avg_bsize'])
+#         mean_tpsd_cluster = real_rad_tpsd_cluster + 1.j*imag_rad_tpsd_cluster
 
-    if cf['smooth_total']:
-        mean_tpsd_cluster = gaussian_filter(input=mean_tpsd_cluster, sigma=cf['smooth_total_pix'])
+#     if cf['smooth_total']:
+#         mean_tpsd_cluster = gaussian_filter(input=mean_tpsd_cluster, sigma=cf['smooth_total_pix'])
 
-    # Test
-   # mean_tpsd_cluster = np.abs(mean_tpsd_cluster)
+#     # Test
+#    # mean_tpsd_cluster = np.abs(mean_tpsd_cluster)
     
-    mean_tpsd_cluster = enmap.ndmap(np.array(mean_tpsd_cluster), wcs=data_wcs)
+#     mean_tpsd_cluster = enmap.ndmap(np.array(mean_tpsd_cluster), wcs=data_wcs)
     
-    return mean_tpsd_cluster, mean_npsd_iterators, mean_spsd
+#     return mean_tpsd_cluster, mean_npsd_iterators, mean_spsd
 
 def func(l, l_knee, alpha, white_noise, eps=1):
     return ( (l_knee / (l+eps) )**-alpha + 1 ) * white_noise**2.
