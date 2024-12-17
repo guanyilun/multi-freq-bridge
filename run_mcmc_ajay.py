@@ -272,7 +272,7 @@ def main():
 
     global cf
 
-    config_data_fname = "configs/config_mcmc_ajay.yaml"
+    config_data_fname = "configs/config_mcmc.yaml"
     
     try:
         cf = ut.get_config_file(config_data_fname)
@@ -478,19 +478,19 @@ def main():
                                         pool=pool, 
                                         backend=backend)
 
-        # sampler.run_mcmc(initial_state=init_params, nsteps=cf['n_iter'])
-        nsteps = cf['n_iter']
-        for i, result in enumerate(sampler.sample(init_params, iterations=nsteps)):
-            # Calculate the iteration number based on the current sample
-            iteration = i + 1
+        sampler.run_mcmc(initial_state=init_params, nsteps=cf['n_iter'], progress=True)
+        # nsteps = cf['n_iter']
+        # for i, result in enumerate(sampler.sample(init_params, iterations=nsteps)):
+        #     # Calculate the iteration number based on the current sample
+        #     iteration = i + 1
 
-            # Calculate acceptance fraction for the current step
-            acceptance_fraction = np.mean(sampler.acceptance_fraction)
+        #     # Calculate acceptance fraction for the current step
+        #     acceptance_fraction = np.mean(sampler.acceptance_fraction)
 
-            # Manually control the output to include acceptance fraction
-            if (iteration % 1 == 0 or iteration == nsteps):
-                # Print out the current iteration, total iterations, and acceptance fraction
-                print(f"Step: {iteration}/{nsteps}: acceptance fraction = {acceptance_fraction:.3f}", end="\r")
+        #     # Manually control the output to include acceptance fraction
+        #     if (iteration % 1 == 0 or iteration == nsteps):
+        #         # Print out the current iteration, total iterations, and acceptance fraction
+        #         print(f"Step: {iteration}/{nsteps}: acceptance fraction = {acceptance_fraction:.3f}")
 
 if __name__ == "__main__":
     main()

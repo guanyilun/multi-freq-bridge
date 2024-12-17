@@ -591,7 +591,7 @@ def fit_one_over_f(l_npsd,
 
     # Initial guess for parameters
     # Find the average of values between l = 5000 and l = 10000
-    white_noise = np.mean(y_filtered[(x_filtered > 5000) & (x_filtered < 10000)])
+    white_noise = np.mean(y_filtered[(x_filtered > 4000) & (x_filtered < 10000)])
 
     p0 = [2000, -3, np.sqrt(white_noise)]  # initial guess for l_knee, alpha, white_noise
 
