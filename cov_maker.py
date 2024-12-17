@@ -206,7 +206,9 @@ def process_combo_cov(combo,
 
         # corrected 2D noise power spectrum
         # mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
-        m = modlmap > 3000
+        lmin = config_data.get('rescale_from_lmin', 3000)
+        print(f"Rescaling noise power spectrum from ell={lmin}")
+        m = modlmap > lmin
         mean_tpsd = mean_tpsd_regions
         mean_tpsd[m] *= scale_factor
         # mean_tpsd = mean_tpsd_regions * scale_factor 

@@ -227,10 +227,13 @@ def get_covariance(freq1,
     if cf['apply_region_weight']:
         mean_spsd = np.sum(all_regions_spsd[:-1], axis=0)
         mean_npsd = np.sum(all_regions_npsd[:-1], axis=0)
+        if cf['use_cluster_only_for_noise']:
+            mean_npsd = all_regions_npsd[-1]
     else:
         mean_spsd = np.mean(all_regions_spsd[:-1], axis=0)
-        # mean_npsd = np.mean(all_regions_npsd[:-1], axis=0)
-        mean_npsd = all_regions_npsd[-1]
+        mean_npsd = np.mean(all_regions_npsd[:-1], axis=0)
+        if cf['use_cluster_only_for_noise']:
+            mean_npsd = all_regions_npsd[-1]
 
     mean_spsd = enmap.ndmap(np.array(mean_spsd), wcs=data_wcs)
 
