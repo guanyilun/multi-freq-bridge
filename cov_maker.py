@@ -34,7 +34,6 @@ import random
 combos = []
 for combo in itertools.product(config_data['data'], config_data['data']):
     combos.append(combo)
-scale_factors = {}
 # Iterate through the list of pairs
 # for pair in combos:
 #     sorted_pair = tuple(sorted(pair))
