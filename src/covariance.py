@@ -173,8 +173,7 @@ def get_covariance(freq1,
 
                 noise_all_splits_loop.append(npsd_region)
 
-            # npsd = (1/(max_split_number*(max_split_number-1))) * np.sum(noise_all_splits_loop, axis=0)
-            npsd = (1/max_split_number) * np.sum(noise_all_splits_loop, axis=0)
+            npsd = (1/(max_split_number*(max_split_number-1))) * np.sum(noise_all_splits_loop, axis=0)
 
             all_regions_npsd.append(enmap.ndmap(np.array(npsd), wcs=data_wcs))
         
@@ -239,6 +238,7 @@ def get_covariance(freq1,
         mean_tpsd_cluster = real_rad_tpsd_cluster + 1.j*imag_rad_tpsd_cluster
 
     if cf['smooth_total']:
+        print("Smoothing the total power spectrum.")
         mean_tpsd_cluster = gaussian_filter(input=mean_tpsd_cluster, sigma=cf['smooth_total_pix'])
     
     # mean_tpsd_cluster = np.abs(mean_tpsd_cluster)
