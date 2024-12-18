@@ -121,8 +121,8 @@ def process_combo_cov(combo,
                                                                                     debug_pix_noise=debug_pix_noise,)
     
     # rescale planck noise level below pixel scale such that ACT will dominate in those scales
-    if 0:
-    #if (inst1 == 'planck' and (combo[0] == combo[1])):
+    #if 0:
+    if (inst1 == 'planck' and (combo[0] == combo[1])):
         print(f"combo = {combo}")
         modlmap = enmap.modlmap(data_shape, data_wcs)
         # 1. taking mean power from tpsd in the range 5000-6000
