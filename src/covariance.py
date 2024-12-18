@@ -602,8 +602,9 @@ def smoothing(l_npsd,
 
 def fit_one_over_f(l_npsd, 
                    b_npsd, 
-                   mask_value, 
-                   geometry):
+                   geometry,
+                   fit_lmin, 
+                   fit_range = [6000, 8000]):
     # 1) 2D noise power spectrum in Fourier space (real and imag part): 2d_psd_orig
     # 2) Make a binned version which in 1D for the abs value (2 arrays, psd, and ell)
     # 3) Fit a functional form to the array above (3 parameters: alpha, knee, and white noise)
@@ -612,14 +613,14 @@ def fit_one_over_f(l_npsd,
     # Step 3: Fit a functional form to the array above (3 parameters: alpha, knee, and white noise)
     x = l_npsd
     y = b_npsd
-    mask = x >= mask_value
+    mask = x >= fit_lmin
 
     x_filtered = x[mask]
     y_filtered = y[mask]
 
     # Initial guess for parameters
     # Find the average of values between l = 5000 and l = 10000
-    white_noise = np.mean(y_filtered[(x_filtered > 5000) & (x_filtered < 10000)])
+    white_noise = np.mean(y_filtered[(x_filtered > fit_range[0]) & (x_filtered < fit_range[1])])
 
     p0 = [2000, -3, np.sqrt(white_noise)]  # initial guess for l_knee, alpha, white_noise
 
