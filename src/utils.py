@@ -166,6 +166,13 @@ def get_config_file(config_file):
 
     return config_data
 
+def save_config_file(config_file, config_data):
+    with open(config_file, 'w') as stream:
+        try:
+            yaml.dump(config_data, stream)
+        except yaml.YAMLError as exc:
+            print(exc)
+
 def get_rho_crit(H_z):
     """
     Get critical density of 
