@@ -24,58 +24,14 @@ import covariance as cov
 
 import matplotlib.pyplot as plt
 
-# %%
-config_data_fname = os.environ["REPO_DIR"] + "/configs/config_mcmc.yaml"
-
-config_data = ut.get_config_file(config_data_fname)
-
-import random
-# Dictionary to store scaling factors for each unique pa4-pa5 pair
-combos = []
-for combo in itertools.product(config_data['data'], config_data['data']):
-    combos.append(combo)
-# Iterate through the list of pairs
-# for pair in combos:
-#     sorted_pair = tuple(sorted(pair))
-#     # Check if the pair involves pa4 and pa5
-#     if ('pa4' in pair[0] and 'pa5' in pair[1]) or ('pa4' in pair[1] and 'pa5' in pair[0]):
-#         # Create a unique identifier for the pair regardless of order
-#         # If this pair hasn't been scaled yet, generate a scale factor
-#         if sorted_pair not in scale_factors:
-#             scale_factors[sorted_pair] = random.uniform(0.5, 1.5)  # Example scaling factor range
-#         # Apply the same scale factor for reverse order pairs
-#         # scale_factor = scale_factors[sorted_pair]
-#         # print(f"Pair: {pair}, Scale Factor: {scale_factor}")
-#     else:
-#         scale_factors[sorted_pair] = 1
-
-# print(scale_factors)
-
-#%%
-cluster_region = ut.get_region(region_center_ra=config_data['region_center_ra'], 
-                               region_center_dec=config_data['region_center_dec'],
-                               region_width=config_data['region_width'])
-
-fname = os.getenv("ACT_DATADIR") + "act_cut_dr6v2_pa6_f150_4way_coadd_map_srcfree.fits"
-
-save_cov = 1
-plot_1d = 0
-plot_2d = 0
-
-data_ref = ut.imap_dim_check(enmap.read_map(fname=fname, box=cluster_region))
-data_shape, data_wcs = data_ref.shape, data_ref.wcs
-
-if save_cov: 
-    cmd = f"mkdir -p {os.environ['COV_DIR']}"
-    print("clearing cov dir: ", cmd)
-    os.system(cmd)
 
 def process_combo_cov(combo, 
-                      geometry=(data_shape, data_wcs), 
+                      config_data,
+                      geometry,
+                      cov_dir,
                       plot_1d=False, 
                       plot_2d=False, 
-                      save_cov=True,
-                      config_data=config_data):
+                      save_cov=True):
     freq1 = combo[0].split('_')[0]
     array1 = combo[0].split('_')[1]
     inst1 = combo[0].split('_')[2]
@@ -97,22 +53,19 @@ def process_combo_cov(combo,
         data_dir2 = os.getenv("PLANCK_DATADIR")
 
     print("Calculating covariance for: {}".format(combo))
+
+    data_shape, data_wcs = geometry
     debug_pix_noise = (False, False)
 
     mean_tpsd, mean_npsd, mean_spsd, all_regions_npsd, all_regions_spsd = cov.get_covariance(freq1=freq1, 
                                                                                              freq2=freq2,
-                                                
                                                                                              array1=array1, 
                                                                                              array2=array2,
-                                                
                                                                                              inst1=inst1, 
                                                                                              inst2=inst2,
-                                                
                                                                                              data_dir1=data_dir1,
                                                                                              data_dir2=data_dir2,
-                                                                                    
                                                                                              data_wcs=geometry[1],
-                                                                                    
                                                                                              cf=config_data,
                                                                                              debug_pix_noise=debug_pix_noise,)
 
@@ -120,15 +73,6 @@ def process_combo_cov(combo,
     if config_data['cluster_region_noise_rescale'] and (combo[0] == combo[1] and (array1 in ['pa4', 'pa5'])):
         print(f"Rescaling cluster region noise for {combo[0]}")
         modlmap = enmap.modlmap(data_shape, data_wcs)
-
-        # binsize = 200
-        # get the avg noise power spectrum in 1D space from all the regions
-        # b_regions, l_regions = [], []
-        # for region in all_regions_npsd:
-        #     b_npsd, l_npsd = enmap.lbin(map=region.real, bsize=binsize)  # should be real in auto case
-        #     # b_npsd, l_npsd = enmap.lbin(map=np.abs(region), bsize=binsize)
-        #     b_regions.append(b_npsd) 
-        #     l_regions.append(l_npsd)
 
         # two ways of computing the average 1d noise power spectrum:
         # 1. compute 1d noise power spectrum for each region and average them
@@ -142,81 +86,58 @@ def process_combo_cov(combo,
         mean_tpsd_regions = mean_spsd_regions + mean_npsd_regions
         tpsd_cluster = all_regions_npsd[-1] + all_regions_spsd[-1]
 
-        # b_avg, l_avg = enmap.lbin(map=np.abs(mean_npsd_regions), bsize=binsize)
-        # b_avg, l_avg = enmap.lbin(map=mean_npsd_regions.real, bsize=binsize)  # should be real in auto case
+        if config_data['rescale_by_transfer']:
+            binsize = 200
+            b_avg, l_avg = enmap.lbin(map=np.abs(mean_npsd_regions), bsize=binsize)
+            b_cluster, l_cluster = enmap.lbin(map=np.abs(all_regions_npsd[-1]), bsize=binsize)
 
-        # npsd from center region
-        # b_npsd_center, l_npsd_center = b_regions[-1], l_regions[-1]
-        # b_npsd_center, l_npsd_center = enmap.lbin(map=np.abs(all_regions_npsd[-1]), bsize=binsize)
-        # b_npsd_center, l_npsd_center = enmap.lbin(map=all_regions_npsd[-1].real, bsize=binsize)  # should be real in auto case
-
-        # 2D fit over all regions except the center
-        # npsd_2d_regions_fit = cov.fit_one_over_f(l_npsd=l_avg,
-        #                                     b_npsd=b_avg,
-        #                                     # twoD_npsd_orig=np.mean(all_regions_npsd[:-1], axis=0),
-        #                                     # gauss_smooth_sigma=config_data["smooth_noise_pix"],
-        #                                     # mask_value=config_data["min_ell_fit"],
-        #                                     mask_value=4000,
-        #                                     geometry=geometry)
+            # 2D fit over all regions except the center
+            npsd_2d_regions_fit = cov.fit_one_over_f(l_npsd=l_avg,
+                                                    b_npsd=b_avg,
+                                                    fit_lmin=500,
+                                                    geometry=geometry)
         
-        # # 2D fit over the center region
-        # npsd_center_fit = cov.fit_one_over_f(l_npsd=l_npsd_center,
-        #                                 b_npsd=b_npsd_center,
-        #                                 # twoD_npsd_orig=all_regions_npsd[-1],
-        #                                 # gauss_smooth_sigma=config_data["smooth_noise_pix"],
-        #                                 # mask_value=config_data["min_ell_fit"],
-        #                                 mask_value=4000,
-        #                                 geometry=geometry)
+            # # 2D fit over the center region
+            npsd_center_fit = cov.fit_one_over_f(l_npsd=l_cluster,
+                                                b_npsd=b_cluster,
+                                                fit_lmin=500,
+                                                geometry=geometry)
         
-        # scale_factor = npsd_center_fit / npsd_2d_regions_fit
-        # scale_factor[0][0] = 1
-        # scale_factor[modlmap < config_data["min_ell_fit"]] = 1
-        # median_scale_factor = np.median(scale_factor[modlmap > 4000])
-        # scale_factor = enmap.zeros(data_shape, data_wcs)
-        # mean_scale_factor = np.median(np.abs(mean_npsd[modlmap > 4000]))
-        # scale_factor[modlmap < 4000] = 1
-
-        # range we are measuring scaling factor (l>4000)
-        m = (modlmap >= 6000) * (modlmap <= 8000)
-        # scale_factor = np.median(np.abs(tpsd_cluster[m])/np.abs(mean_tpsd_regions[m]))
-        fit_by_tpsd = False
-        fit_by_npsd = True
-        if fit_by_tpsd:
-            scale_factor = np.median(np.abs(tpsd_cluster[m])/np.abs(mean_tpsd_regions[m]))
-        elif fit_by_npsd:
-            scale_factor = np.mean(np.abs(all_regions_npsd[-1][m])/np.abs(mean_npsd_regions[m]))
-        # scale_factor = np.median(np.abs(all_regions_npsd[-1][m])/np.abs(mean_npsd_regions[m]))
-        # scale_factor[modlmap >= 4000] =  np.median(np.abs(all_regions_npsd[-1][m])/np.abs(mean_npsd_regions[m]))
-        # scale_factors[tuple(combo)] = scale_factor
-        # scale_factor = np.round(scale_factor, 4) * 4
-        # scale_factor = 0.7 
-        # scale only autocase
-        # print(f"{tuple(combo)}: {np.min(scale_factor)}")
-        print(f"{tuple(combo)}: {scale_factor}")
-        # scale_factor = scale_factors[tuple(sorted(combo))]
-        # print(f"Scale factor: {scale_factor}")
-        # print(f"combo: {combo}")
-        # scale_factor = np.mean(scale_factor[modlmap > 5000])
-        # print(f"Scale factor: {scale_factor}")
-        # combo_seed = hash(tuple(sorted(combo))) % 1000
-        # np.random.seed(combo_seed)
-        # scale_factor = np.random.uniform(0.5, 1.5)
-        # scale_factor = round(scale_factor, 4)
-        # print(f"{combo}: {scale_factor}")
-
-        # corrected 2D noise power spectrum
-        # mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
-        lmin = config_data.get('rescale_from_lmin', 3000)
-        print(f"Rescaling noise power spectrum from ell={lmin}")
-        m = modlmap > lmin
-        mean_tpsd = mean_tpsd_regions
-        mean_tpsd[m] *= scale_factor
-        # mean_tpsd = mean_tpsd_regions * scale_factor 
-        # mean_tpsd = mean_npsd
-
-        # b_scaled, l_scaled = enmap.lbin(map=np.abs(mean_npsd), bsize=binsize)
-        # b_center_fit, l_center_fit = enmap.lbin(map=np.abs(npsd_center_fit), bsize=binsize)
-        # b_regions_fit, l_regions_fit = enmap.lbin(map=np.abs(npsd_2d_regions_fit), bsize=binsize)
+            scale_factor = npsd_center_fit / npsd_2d_regions_fit
+            print("Rescaling noise power spectrum by transfer function")
+            print(f"{tuple(combo)}: {np.median(scale_factor)}")
+            lmin = config_data.get('cluster_region_noise_rescale_lmin', 3000)
+            print(f"Rescaling noise power spectrum from ell={lmin}")
+            m = modlmap > lmin
+            if config_data['apply_transfer_to_tpsd']:
+                mean_tpsd = mean_tpsd_regions
+                mean_tpsd[m] *= scale_factor[m]
+            else:
+                mean_npsd = mean_npsd_regions
+                mean_npsd[m] *= scale_factor[m]
+                mean_tpsd = mean_spsd_regions + mean_npsd
+        else:
+            print("Rescaling noise power spectrum by number")
+            # range we are measuring scaling factor (l>4000)
+            m = (modlmap >= 6000) * (modlmap <= 8000)
+            # scale_factor = np.median(np.abs(tpsd_cluster[m])/np.abs(mean_tpsd_regions[m]))
+            fit_by_tpsd = False
+            fit_by_npsd = True
+            if fit_by_tpsd:
+                scale_factor = np.median(np.abs(tpsd_cluster[m])/np.abs(mean_tpsd_regions[m]))
+            elif fit_by_npsd:
+                scale_factor = np.mean(np.abs(all_regions_npsd[-1][m])/np.abs(mean_npsd_regions[m]))
+            print(f"{tuple(combo)}: {scale_factor}")
+            lmin = config_data.get('cluster_region_noise_rescale_lmin', 3000)
+            print(f"Rescaling noise power spectrum from ell={lmin}")
+            m = modlmap > lmin
+            if config_data['apply_transfer_to_tpsd']:
+                mean_tpsd = mean_tpsd_regions
+                mean_tpsd[m] *= scale_factor
+            else:
+                mean_npsd = mean_npsd_regions
+                mean_npsd[m] *= scale_factor
+                mean_tpsd = mean_spsd_regions + mean_npsd
 
         if config_data['smooth_total']:
             print("Smoothing total power spectrum")
@@ -267,19 +188,57 @@ def process_combo_cov(combo,
 
     if plot_2d:
         ut.plot_image(image=np.fft.fftshift(np.abs(mean_tpsd)), 
-                      title="Total power spectrum",
-                      interval_type='zscale')
+                    title="Total power spectrum",
+                    interval_type='zscale')
 
     if save_cov:
         # np.save(file=f"{os.environ['COV_DIR']}_ref/cov_{freq1}_{array1}_{inst1}_{scan1}_{freq2}_{array2}_{inst2}_{scan2}.npy", arr=mean_tpsd)
-        ofile = f"{os.environ['COV_DIR']}/cov_{freq1}_{array1}_{inst1}_{scan1}_{freq2}_{array2}_{inst2}_{scan2}.npy"
+        ofile = f"{cov_dir}/cov_{freq1}_{array1}_{inst1}_{scan1}_{freq2}_{array2}_{inst2}_{scan2}.npy"
         print(f"Saving covariance to {ofile}")
         np.save(file=ofile, arr=mean_tpsd)
 
 
-combos = list(itertools.product(config_data['data'], config_data['data']))
-num_processes = multiprocessing.cpu_count()
-print(f"Number of processes: {num_processes}")
+def main(config_data_fname, cov_dir=os.environ['COV_DIR'], save_cov=True, clear_dir=True):
+    config_data = ut.get_config_file(config_data_fname)
 
-with multiprocessing.Pool(processes=num_processes) as pool:
-    pool.map(process_combo_cov, combos)
+    cluster_region = ut.get_region(region_center_ra=config_data['region_center_ra'], 
+                                region_center_dec=config_data['region_center_dec'],
+                                region_width=config_data['region_width'])
+
+    fname = os.getenv("ACT_DATADIR") + "act_cut_dr6v2_pa6_f150_4way_coadd_map_srcfree.fits"
+
+    # plot_1d = 0
+    # plot_2d = 0
+
+    data_ref = ut.imap_dim_check(enmap.read_map(fname=fname, box=cluster_region))
+    data_shape, data_wcs = data_ref.shape, data_ref.wcs
+
+    if save_cov and clear_dir and os.path.exists(cov_dir): 
+        cmd = f"mkdir -p {cov_dir}"
+        print("clearing cov dir: ", cmd)
+        os.system(cmd)
+
+    combos = list(itertools.product(config_data['data'], config_data['data']))
+    num_processes = multiprocessing.cpu_count()
+    print(f"Number of processes: {num_processes}")
+
+    with multiprocessing.Pool(processes=num_processes) as pool:
+        fun = partial(process_combo_cov, 
+                      config_data=config_data,
+                      cov_dir=cov_dir,
+                      geometry=(data_shape, data_wcs),
+                      plot_1d=False, 
+                      plot_2d=False, 
+                      save_cov=save_cov)
+        pool.map(fun, combos)
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description='Make covariance matrices')
+    parser.add_argument('--config', type=str, help='Path to the config file')
+    parser.add_argument('--cov', type=str, default=os.environ['COV_DIR'], help='Path to the directory to save the covariances')
+    parser.add_argument('--clear', action='store_true', help='Clear the directory before saving the covariances')
+    args = parser.parse_args()
+    if not os.path.exists(args.cov):
+        os.makedirs(args.cov)
+    main(args.config, args.cov, args.clear)
