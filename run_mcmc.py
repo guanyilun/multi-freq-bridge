@@ -14,7 +14,11 @@ import itertools
 import glob
 import sys
 import warnings
-import scipy
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+
 warnings.filterwarnings('ignore')
 
 # Pretty table
@@ -246,7 +250,7 @@ def lnprob(theta):
     
     return lp + lnlike(theta=theta)    
 
-def main():
+def main(config_data_fname, cov_dir=cov_dir, outdir=dir_base):
     global data_list_array
     global beam_list_array
     global icov
@@ -272,8 +276,6 @@ def main():
 
     global cf
 
-    config_data_fname = "configs/config_mcmc.yaml"
-    
     try:
         cf = ut.get_config_file(config_data_fname)
     except FileNotFoundError:
@@ -452,7 +454,16 @@ def main():
     fil_w0_min_pix = cf['fil_w0_min_arcmin'] / 0.5  # arcmin/pix
     fil_w0_max_pix = cf['fil_w0_max_arcmin'] / 0.5  # arcmin/pix 
 
-    mcmc_filepath = f"{dir_base}/{cf['mcmc_filename']}"
+    mcmc_filepath = f"{outdir}/{cf['mcmc_filename']}"
+    if rank == 0:
+        if not os.path.exists(f"{outdir}"):
+            os.makedirs(f"{outdir}")
+    comm.Barrier()
+
+    # save config_data to run_name directory
+    if rank == 0:
+        config_file_path = f"{outdir}/config.yaml"
+        ut.save_config_file(config_file_path, cf)
 
     print("MCMC file path: ", mcmc_filepath)
 
@@ -493,4 +504,10 @@ def main():
                 print(f"Step: {iteration}/{nsteps}: acceptance fraction = {acceptance_fraction:.3f}", end="\r")
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    parser = argparse.ArgumentParser(description="Run MCMC.")
+    parser.add_argument("--config", type=str, help="Config data file name.")
+    parser.add_argument("--cov", type=str, default=cov_dir, help="Covariance directory.")
+    parser.add_argument("--odir", type=str, default=dir_base, help="Output directory.")
+    args = parser.parse_args()
+    main(args.config, cov_dir=args.cov, outdir=args.odir)
