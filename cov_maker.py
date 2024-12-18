@@ -192,13 +192,12 @@ def process_combo_cov(combo,
                     interval_type='zscale')
 
     if save_cov:
-        # np.save(file=f"{os.environ['COV_DIR']}_ref/cov_{freq1}_{array1}_{inst1}_{scan1}_{freq2}_{array2}_{inst2}_{scan2}.npy", arr=mean_tpsd)
         ofile = f"{cov_dir}/cov_{freq1}_{array1}_{inst1}_{scan1}_{freq2}_{array2}_{inst2}_{scan2}.npy"
         print(f"Saving covariance to {ofile}")
         np.save(file=ofile, arr=mean_tpsd)
 
 
-def main(config_data_fname, cov_dir=os.environ['COV_DIR'], save_cov=True, clear_dir=True):
+def main(config_data_fname, cov_dir=os.environ['COV_DIR'], save_cov=True):
     config_data = ut.get_config_file(config_data_fname)
 
     cluster_region = ut.get_region(region_center_ra=config_data['region_center_ra'], 
@@ -212,11 +211,6 @@ def main(config_data_fname, cov_dir=os.environ['COV_DIR'], save_cov=True, clear_
 
     data_ref = ut.imap_dim_check(enmap.read_map(fname=fname, box=cluster_region))
     data_shape, data_wcs = data_ref.shape, data_ref.wcs
-
-    if save_cov and clear_dir and os.path.exists(cov_dir): 
-        cmd = f"mkdir -p {cov_dir}"
-        print("clearing cov dir: ", cmd)
-        os.system(cmd)
 
     combos = list(itertools.product(config_data['data'], config_data['data']))
     num_processes = multiprocessing.cpu_count()
@@ -241,4 +235,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if not os.path.exists(args.cov):
         os.makedirs(args.cov)
-    main(args.config, args.cov, args.clear)
+    main(args.config, args.cov)
