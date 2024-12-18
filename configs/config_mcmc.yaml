@@ -114,9 +114,11 @@ smooth_total_type: gaussian
 smooth_signal_pix: 1.25
 smooth_noise_pix: 1.25
 smooth_total_pix: 1.5 # pixels the sigma
-min_ell_fit: 500 # For the minimum ell to fit the data for smoothing the noise cov
 apply_region_weight: False
 cluster_region_noise_rescale: True
+cluster_region_noise_rescale_lmin: -1
+apply_transfer_to_tpsd: False
+rescale_by_transfer: True
 whiten_planck: True
 whiten_act: False
 use_cluster_only_for_noise: False
