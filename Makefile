@@ -11,7 +11,7 @@ mcmc_test:
 	fi
 
 cov:
-	python cov_maker.py
+	python cov_maker.py --config configs/config_mcmc.yaml
 
 check_cov_valid:
 	python test_cov_valid.py
