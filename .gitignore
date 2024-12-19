@@ -1,3 +1,6 @@
 .env
 .ipynb
 __pycache__
+logs
+runs
+data
