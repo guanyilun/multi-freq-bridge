@@ -216,14 +216,16 @@ def lnlike(theta):
                               z=cf['c1_z'],
                               muo=cf['c1_muo'],
                               xgrid=xgrid, 
-                              ygrid=ygrid)
+                              ygrid=ygrid,
+                              ellipticity_type=cf["ellipticity_type"])
         
         c2_model = c2.szmodel(frequency=freq,
                                 array=array,
                                 z=cf['c2_z'],
                                 muo=cf['c2_muo'],
                                 xgrid=xgrid,
-                                ygrid=ygrid)
+                                ygrid=ygrid, 
+                                ellipticity_type=cf["ellipticity_type"])
         
         fil_model = fil.szmodel(frequency=freq,
                                 array=array,

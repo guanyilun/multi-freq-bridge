@@ -127,7 +127,8 @@ class Cluster():
               array,
               xgrid, 
               ygrid,
-              muo):
+              muo,
+              ellipticity_type):
         
         # Setup SZpack parameters class
         SZ_params = SZ.parameters()
@@ -169,7 +170,13 @@ class Cluster():
         yprime = ((xgrid - (self.ra_pix))*np.sin(self.theta_cluster) +
                   (ygrid - (self.dec_pix))*np.cos(self.theta_cluster))
 
-        r = np.sqrt(xprime**2. + (yprime * self.R)**2.)
+        # ajay adding this for debugging
+        if ellipticity_type == "numerator":
+            r = np.sqrt(xprime**2. + (yprime * self.R)**2.)
+        elif ellipticity_type == "denominator":
+            r = np.sqrt(xprime**2. + (yprime / self.R)**2.) # bounded between 0 and 1
+        else:
+            raise ValueError("Invalid ellipticity type.")
 
         rc_pix = self.rc_arcmin / 0.5
 
