@@ -92,6 +92,10 @@ v_avg_min: -10000
 v_avg_max: 10000
 v_delta_min: -15000
 v_delta_max: 15000
+
+l_taper_min: -0.5
+l_taper_max: 0.5
+
 beam_version: "dr6v2"
 n_walkers: 100
 n_iter: 100000000

@@ -27,6 +27,7 @@ class Filament():
         self.A_D = theta[24]
         self.v_avg = theta[25]
         self.theta_bridge = np.deg2rad(117)
+        self.l_taper = theta[26]  # YG: added taper length
 
     def szmodel(self, 
                 frequency, 
@@ -73,8 +74,11 @@ class Filament():
         l = ( (xgrid - self.ra_pix)*np.cos(self.theta_bridge) 
              - (ygrid - self.dec_pix)*np.sin(self.theta_bridge) )
 
+        l_taper = np.maximum(0, 1 + (l*self.l_taper))  # YG: added taper length
+
         # Mesa model
-        bridge_shape = 1 / (1 + (l/self.l0_pix)**8 + (w/self.w0_pix)**8)
+        # bridge_shape = 1 / (1 + (l/self.l0_pix)**8 + (w/self.w0_pix)**8)
+        bridge_shape = l_taper / (1 + (l/self.l0_pix)**8 + (w/self.w0_pix)**8)  # YG: added taper length
 
         # SZ effect signal calculation
         DI = SZ.compute_combo(SZ_params, DI=True) * 10**6. # Jy/sr

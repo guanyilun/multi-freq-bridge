@@ -6,7 +6,6 @@ import os
 # General modules
 from numba import jit
 from schwimmbad import MPIPool
-#from multiprocessing import Pool
 import numpy as np
 from pixell import enmap
 import emcee
@@ -82,8 +81,9 @@ def get_initial_params(cf, n_walkers):
     v_avg_init = np.random.uniform(cf['v_avg_min'], cf['v_avg_max'], size=n_walkers)
     #v_delta_init = np.random.uniform(cf['v_delta_min'], cf['v_delta_max'], size=n_walkers)
 
+    l_taper_init = np.random.uniform(cf['l_taper_min'], cf['l_taper_max'], size=n_walkers)
     # Define the initial parameter array with indices
-    ret_array = np.array([
+    ret_array = [
         # Cluster 1: Abell 401
         c1_ra_init,         # 0 - Right Ascension
         c1_dec_init,        # 1 - Declination
@@ -116,12 +116,14 @@ def get_initial_params(cf, n_walkers):
         fil_A_D_init,        # 24 - Amplitude of dust
 
         # Average velocity
-        v_avg_init          # 25 - Average velocity
+        v_avg_init,          # 25 - Average velocity
         #v_delta_init       # 26 - Velocity difference (commented out)
-    ]).T
-    return ret_array
+        l_taper_init        # 26 - Taper length
+    ]
+
+    return np.array(ret_array).T
             
-def lnprior(theta):    
+def lnprior(theta):
     """
     Prior function for MCMC.
 
@@ -160,11 +162,13 @@ def lnprior(theta):
                 and cf['fil_Dtau_min'] < theta[22] < cf['fil_Dtau_max']
                 and cf['fil_Te_min'] < theta[23] < cf['fil_Te_max']
                 and cf['fil_A_D_min'] < theta[24] < cf['fil_A_D_max']
+                and cf['l_taper_min'] < theta[26] < cf['l_taper_max']  # YG: added taper length
                 )
     
     check_v_avg = cf['v_avg_min'] < theta[25] < cf['v_avg_max']
     #check_v_delta = cf['v_delta_min'] < theta[26] < cf['v_delta_max']
-    
+
+
     if check_c1 and check_c2 and check_v_avg and check_fil:
         term1 = -0.5 * ( (theta[7]-cf['c1_Te_mean'])**2. / cf['c1_Te_std']**2 )
         term2 = -0.5 * ( (theta[16]-cf['c2_Te_mean'])**2. / cf['c2_Te_std']**2 )
