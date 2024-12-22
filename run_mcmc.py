@@ -80,7 +80,7 @@ def get_initial_params(cf, n_walkers):
     fil_Dtau_init = np.random.uniform(cf['fil_Dtau_min'], cf['fil_Dtau_max'], size=n_walkers)
     fil_Te_init = np.random.uniform(cf['fil_Te_min'], cf['fil_Te_max'], size=n_walkers)
     fil_A_D_init = np.random.uniform(float(cf['fil_A_D_min']), float(cf['fil_A_D_max']), size=n_walkers)
-    fil_v_init = np.random.uniform(cf['fil_avg_min'], cf['fil_avg_max'], size=n_walkers)
+    fil_v_init = np.random.uniform(cf['fil_v_min'], cf['fil_v_max'], size=n_walkers)
 
     # average velocity
     vavg_init = np.random.uniform(cf['v_avg_min'], cf['v_avg_max'], size=n_walkers)
