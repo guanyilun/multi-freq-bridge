@@ -461,9 +461,9 @@ def main(config_data_fname, cov_dir=cov_dir, outdir=dir_base):
     comm.Barrier()
 
     # save config_data to run_name directory
-    if rank == 0:
-        config_file_path = f"{outdir}/config.yaml"
-        ut.save_config_file(config_file_path, cf)
+    # if rank == 0:
+    #     config_file_path = f"{outdir}/config.yaml"
+    #     ut.save_config_file(config_file_path, cf)
 
     print("MCMC file path: ", mcmc_filepath)
 
@@ -491,6 +491,9 @@ def main(config_data_fname, cov_dir=cov_dir, outdir=dir_base):
 
         # sampler.run_mcmc(initial_state=init_params, nsteps=cf['n_iter'])
         nsteps = cf['n_iter']
+        if init_params is None:
+            init_params = sampler.backend.get_last_sample()
+
         for i, result in enumerate(sampler.sample(init_params, iterations=nsteps)):
             # Calculate the iteration number based on the current sample
             iteration = i + 1
