@@ -58,7 +58,7 @@ def get_initial_params(cf, n_walkers):
     c1_Te_init = np.random.uniform(cf['c1_Te_min'], cf['c1_Te_max'], size=n_walkers)
     c1_theta_init = np.random.uniform(cf['c1_theta_min'], cf['c1_theta_max'], size=n_walkers)
     c1_A_D_init = np.random.uniform(float(cf['c1_A_D_min']), float(cf['c1_A_D_max']), size=n_walkers)
-    c1_v_init = np.random.uniform(cf['c1_v_min'], cf['c1_v_max'], size=n_walkers)
+   # c1_v_init = np.random.uniform(cf['c1_v_min'], cf['c1_v_max'], size=n_walkers)
 
     # cluster 2: Abell 399
     c2_ra_init = np.random.uniform(c2_ra_min_pix, c2_ra_max_pix, size=n_walkers)
@@ -70,7 +70,7 @@ def get_initial_params(cf, n_walkers):
     c2_Te_init = np.random.uniform(cf['c2_Te_min'], cf['c2_Te_max'], size=n_walkers)
     c2_theta_init = np.random.uniform(cf['c2_theta_min'], cf['c2_theta_max'], size=n_walkers)
     c2_A_D_init = np.random.uniform(float(cf['c2_A_D_min']), float(cf['c2_A_D_max']), size=n_walkers)
-    c2_v_init = np.random.uniform(cf['c2_v_min'], cf['c2_v_max'], size=n_walkers)
+    #c2_v_init = np.random.uniform(cf['c2_v_min'], cf['c2_v_max'], size=n_walkers)
 
     # filament
     fil_ra_init = np.random.uniform(fil_ra_min_pix, fil_ra_max_pix, size=n_walkers)
@@ -80,7 +80,7 @@ def get_initial_params(cf, n_walkers):
     fil_Dtau_init = np.random.uniform(cf['fil_Dtau_min'], cf['fil_Dtau_max'], size=n_walkers)
     fil_Te_init = np.random.uniform(cf['fil_Te_min'], cf['fil_Te_max'], size=n_walkers)
     fil_A_D_init = np.random.uniform(float(cf['fil_A_D_min']), float(cf['fil_A_D_max']), size=n_walkers)
-    fil_v_init = np.random.uniform(cf['fil_v_min'], cf['fil_v_max'], size=n_walkers)
+    #fil_v_init = np.random.uniform(cf['fil_v_min'], cf['fil_v_max'], size=n_walkers)
 
     # average velocity
     vavg_init = np.random.uniform(cf['v_avg_min'], cf['v_avg_max'], size=n_walkers)
