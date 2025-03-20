@@ -235,13 +235,10 @@ def get_covariance(freq1,
         if cf['use_cluster_only_for_noise']:
             mean_npsd = all_regions_npsd[-1]
 
-<<<<<<< HEAD
     mean_spsd = enmap.ndmap(np.array(mean_spsd), wcs=data_wcs)
-=======
     # use the cluster center region for the noise
     #mean_npsd = all_regions_npsd[-1]
     mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
->>>>>>> c99c6021b9ec6fb48c9db6995ed686b0de7d15f9
 
     if cf['rad_avg_noise']:
         mean_npsd = enmap.ndmap(np.array(mean_npsd), wcs=data_wcs)
