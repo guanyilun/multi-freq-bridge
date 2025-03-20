@@ -1,7 +1,7 @@
 #!/bin/bash
-#PBS -N mcmc_ajay_baseline
-#PBS -o logs/mf_baseline.out
-#PBS -e logs/mf_baseline.err
+#PBS -N mcmc_ajay_case42
+#PBS -o logs_ajay/mf_baseline.out
+#PBS -e logs_ajay/mf_baseline.err
 #PBS -l walltime=12:00:00
 #PBS -l nodes=1:ppn=32
 #PBS -q greenq
@@ -10,12 +10,12 @@ cd $PBS_O_WORKDIR
 module load openmpi
 
 # name=case1_1
-name=config_ajay
+name=case42 
 prefix=baseline
 # config=configs/${name}.yaml
-odir=/fs/lustre/scratch/yguan/data/multi-freq-bridge/runs/${prefix}_${name}
+odir=/fs/lustre/scratch/agill/run_ajay/${name}
 cov=${odir}/cov
-config=configs/${name}.yaml
+config=configs/${name}_ajay.yaml
 
 # base_config=configs/${name}.yaml
 # config=configs/_tmp_${name}.yaml
