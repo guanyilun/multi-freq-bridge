@@ -125,6 +125,7 @@ use_cluster_only_for_noise: False
 # Miscellaneaus parameters
 temp_model_type: isothermal
 repeat_h5: "true"
+model_choice: "fit_vavg"
 data:
   - 150_pa4_act_dr6v2
   - 220_pa4_act_dr6v2
