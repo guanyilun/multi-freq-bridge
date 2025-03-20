@@ -12,21 +12,34 @@ const_h = 6.626070149999999e-25 # J / GHz
 
 class Filament():
 
-    def __init__(self, theta):
-       
+    def __init__(self, theta, model_choice):
+        self.model_choice = model_choice
+
         self.initialize(theta=theta)
 
     def initialize(self, theta):
-
-        self.ra_pix = theta[18]
-        self.dec_pix = theta[19]
-        self.l0_pix = theta[20]
-        self.w0_pix = theta[21]
-        self.Dtau = theta[22]
-        self.Te = theta[23]
-        self.A_D = theta[24]
-        self.v_avg = theta[25]
-        self.theta_bridge = np.deg2rad(117)
+        if self.model_choice == "fit_vavg":
+            self.ra_pix = theta[18]
+            self.dec_pix = theta[19]
+            self.l0_pix = theta[20]
+            self.w0_pix = theta[21]
+            self.Dtau = theta[22]
+            self.Te = theta[23]
+            self.A_D = theta[24]
+            self.fil_v_avg = theta[25]
+            self.theta_bridge = np.deg2rad(117)
+        elif self.model_choice == "fit_individual":
+            self.ra_pix = theta[20]
+            self.dec_pix = theta[21]
+            self.l0_pix = theta[22]
+            self.w0_pix = theta[23]
+            self.Dtau = theta[24]
+            self.Te = theta[25]
+            self.A_D = theta[26]
+            self.fil_v_avg = theta[27]
+            self.theta_bridge = np.deg2rad(117)
+        else:
+            raise ValueError("Invalid model choice.")
 
     def szmodel(self, 
                 frequency, 
@@ -44,9 +57,9 @@ class Filament():
         SZ_params.beta_order = 2
         SZ_params.Dtau = self.Dtau
 
-        SZ_params.betac = np.abs(self.v_avg) * 1000 / const_c
+        SZ_params.betac = np.abs(self.fil_v_avg) * 1000 / const_c
 
-        if self.v_avg < 0:
+        if self.fil_v_avg < 0:
             SZ_params.muc = -1
         else:
             SZ_params.muc = 1
@@ -117,8 +130,10 @@ class Cluster():
     Dust emission (Modified Blackbody)
     """
 
-    def __init__(self, theta, name): 
+    def __init__(self, theta, name, model_choice): 
         self.name = name
+        self.model_choice = model_choice
+
         self.initialize(theta=theta)
 
     def szmodel(self, 
@@ -127,7 +142,8 @@ class Cluster():
               array,
               xgrid, 
               ygrid,
-              muo):
+              muo,
+              ellipticity_type):
         
         # Setup SZpack parameters class
         SZ_params = SZ.parameters()
@@ -138,10 +154,13 @@ class Cluster():
         SZ_params.beta_order = 2
         SZ_params.Dtau = self.Dtau
 
-        if self.name == "abell401":
-            vc = self.v_avg + (520 / 2)
-        elif self.name == "abell399":
-            vc = self.v_avg - (520 / 2)
+        if self.model_choice == "fit_vavg":
+            if self.name == "abell401":
+                vc = self.v_avg + (520 / 2)
+            elif self.name == "abell399":
+                vc = self.v_avg - (520 / 2)
+        elif self.model_choice == "fit_individual":
+            vc = self.v_avg
         
         SZ_params.betac = np.abs(vc) * 1000 / const_c
 
@@ -169,7 +188,13 @@ class Cluster():
         yprime = ((xgrid - (self.ra_pix))*np.sin(self.theta_cluster) +
                   (ygrid - (self.dec_pix))*np.cos(self.theta_cluster))
 
-        r = np.sqrt(xprime**2. + (yprime * self.R)**2.)
+        # ajay adding this for debugging
+        if ellipticity_type == "numerator":
+            r = np.sqrt(xprime**2. + (yprime * self.R)**2.)
+        elif ellipticity_type == "denominator":
+            r = np.sqrt(xprime**2. + (yprime / self.R)**2.) # bounded between 0 and 1
+        else:
+            raise ValueError("Invalid ellipticity type.")
 
         rc_pix = self.rc_arcmin / 0.5
 
@@ -204,7 +229,6 @@ class Cluster():
                                     x=freq_array, dx=del_freq)
         
         dust_signal = numerator_dust / bandpass_int
-        # dust_signal *= beta_density_map_2d
 
         total_model = beta_density_map_2d * (sz_signal + dust_signal)
         
@@ -212,32 +236,56 @@ class Cluster():
 
     def initialize(self, theta):
 
-        if self.name == "abell401":
-            self.ra_pix = theta[0]
-            self.dec_pix = theta[1]
-            self.beta = theta[2]
-            self.rc_arcmin = theta[3]
-            self.R = theta[4]
-            self.theta_cluster = np.deg2rad(theta[5])
-            self.Dtau = theta[6]
-            self.T_e = theta[7]
-            self.A_D = theta[8]
+        if self.model_choice == "fit_vavg":
+            if self.name == "abell401":
+                self.ra_pix = theta[0]
+                self.dec_pix = theta[1]
+                self.beta = theta[2]
+                self.rc_arcmin = theta[3]
+                self.R = theta[4]
+                self.theta_cluster = np.deg2rad(theta[5])
+                self.Dtau = theta[6]
+                self.T_e = theta[7]
+                self.A_D = theta[8]
+                self.v_avg = theta[25]
 
-            self.v_avg = theta[25]
-            #self.v_delta = theta[26]
-
-        elif self.name == "abell399":
-            self.ra_pix = theta[9]
-            self.dec_pix = theta[10]
-            self.beta = theta[11]
-            self.rc_arcmin = theta[12]
-            self.R = theta[13]
-            self.theta_cluster = np.deg2rad(theta[14])
-            self.Dtau = theta[15]
-            self.T_e = theta[16]
-            self.A_D = theta[17]
-
-            self.v_avg = theta[25]
-            #self.v_delta = theta[26]
-
+            elif self.name == "abell399":
+                self.ra_pix = theta[9]
+                self.dec_pix = theta[10]
+                self.beta = theta[11]
+                self.rc_arcmin = theta[12]
+                self.R = theta[13]
+                self.theta_cluster = np.deg2rad(theta[14])
+                self.Dtau = theta[15]
+                self.T_e = theta[16]
+                self.A_D = theta[17]
+                self.v_avg = theta[25]
+            else:
+                raise ValueError("Invalid cluster name.")
+        
+        elif self.model_choice == "fit_individual":
+            if self.name == "abell401":
+                self.ra_pix = theta[0]
+                self.dec_pix = theta[1]
+                self.beta = theta[2]
+                self.rc_arcmin = theta[3]
+                self.R = theta[4]
+                self.theta_cluster = np.deg2rad(theta[5])
+                self.Dtau = theta[6]
+                self.T_e = theta[7]
+                self.A_D = theta[8]
+                self.v_avg = theta[9]
+            elif self.name == "abell399":
+                self.ra_pix = theta[10]
+                self.dec_pix = theta[11]
+                self.beta = theta[12]
+                self.rc_arcmin = theta[13]
+                self.R = theta[14]
+                self.theta_cluster = np.deg2rad(theta[15])
+                self.Dtau = theta[16]
+                self.T_e = theta[17]
+                self.A_D = theta[18]
+                self.v_avg = theta[19]
+            else:
+                raise ValueError("Invalid cluster name.")
 

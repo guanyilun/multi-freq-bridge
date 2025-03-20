@@ -58,6 +58,7 @@ def get_initial_params(cf, n_walkers):
     c1_Te_init = np.random.uniform(cf['c1_Te_min'], cf['c1_Te_max'], size=n_walkers)
     c1_theta_init = np.random.uniform(cf['c1_theta_min'], cf['c1_theta_max'], size=n_walkers)
     c1_A_D_init = np.random.uniform(float(cf['c1_A_D_min']), float(cf['c1_A_D_max']), size=n_walkers)
+   # c1_v_init = np.random.uniform(cf['c1_v_min'], cf['c1_v_max'], size=n_walkers)
 
     # cluster 2: Abell 399
     c2_ra_init = np.random.uniform(c2_ra_min_pix, c2_ra_max_pix, size=n_walkers)
@@ -69,6 +70,7 @@ def get_initial_params(cf, n_walkers):
     c2_Te_init = np.random.uniform(cf['c2_Te_min'], cf['c2_Te_max'], size=n_walkers)
     c2_theta_init = np.random.uniform(cf['c2_theta_min'], cf['c2_theta_max'], size=n_walkers)
     c2_A_D_init = np.random.uniform(float(cf['c2_A_D_min']), float(cf['c2_A_D_max']), size=n_walkers)
+    #c2_v_init = np.random.uniform(cf['c2_v_min'], cf['c2_v_max'], size=n_walkers)
 
     # filament
     fil_ra_init = np.random.uniform(fil_ra_min_pix, fil_ra_max_pix, size=n_walkers)
@@ -78,12 +80,56 @@ def get_initial_params(cf, n_walkers):
     fil_Dtau_init = np.random.uniform(cf['fil_Dtau_min'], cf['fil_Dtau_max'], size=n_walkers)
     fil_Te_init = np.random.uniform(cf['fil_Te_min'], cf['fil_Te_max'], size=n_walkers)
     fil_A_D_init = np.random.uniform(float(cf['fil_A_D_min']), float(cf['fil_A_D_max']), size=n_walkers)
+    #fil_v_init = np.random.uniform(cf['fil_v_min'], cf['fil_v_max'], size=n_walkers)
 
-    v_avg_init = np.random.uniform(cf['v_avg_min'], cf['v_avg_max'], size=n_walkers)
-    #v_delta_init = np.random.uniform(cf['v_delta_min'], cf['v_delta_max'], size=n_walkers)
+    # average velocity
+    vavg_init = np.random.uniform(cf['v_avg_min'], cf['v_avg_max'], size=n_walkers)
 
-    # Define the initial parameter array with indices
-    ret_array = np.array([
+    if cf["model_choice"] == "fit_vavg":
+        # fits average velocity only
+        ret_array = np.array([
+            # Cluster 1: Abell 401
+            c1_ra_init,         # 0 - Right Ascension
+            c1_dec_init,        # 1 - Declination
+            c1_beta_init,       # 2 - Beta
+            c1_rc_arcmin_init,  # 3 - Core radius (arcminutes)
+            c1_R_init,          # 4 - Radius
+            c1_theta_init,      # 5 - Theta
+            c1_Dtau_init,       # 6 - Optical depth
+            c1_Te_init,         # 7 - Electron temperature
+            c1_A_D_init,        # 8 - Amplitude of dust
+
+            # Cluster 2: Abell 399
+            c2_ra_init,         # 9 - Right Ascension
+            c2_dec_init,        # 10 - Declination
+            c2_beta_init,       # 11 - Beta
+            c2_rc_arcmin_init,  # 12 - Core radius (arcminutes)
+            c2_R_init,          # 13 - Radius
+            c2_theta_init,      # 14 - Theta
+            c2_Dtau_init,       # 15 - Optical depth
+            c2_Te_init,         # 16 - Electron temperature
+            c2_A_D_init,        # 17 - Amplitude of dust
+
+            # Filament
+            fil_ra_init,        # 18 - Right Ascension
+            fil_dec_init,       # 19 - Declination
+            fil_l0_init,        # 20 - Length (pixels)
+            fil_w0_init,        # 21 - Width (pixels)
+            fil_Dtau_init,      # 22 - Optical depth
+            fil_Te_init,        # 23 - Electron temperature
+            fil_A_D_init,       # 24 - Amplitude of dust
+
+            vavg_init           # 25 - Velocity
+
+        ]).T
+
+        return ret_array
+
+    elif cf["model_choice"] == "fit_individual":    
+        # fits individual cluster and filament velocities    
+        # Define the initial parameter array with indices
+        ret_array = np.array([
+
         # Cluster 1: Abell 401
         c1_ra_init,         # 0 - Right Ascension
         c1_dec_init,        # 1 - Declination
@@ -94,85 +140,119 @@ def get_initial_params(cf, n_walkers):
         c1_Dtau_init,       # 6 - Optical depth
         c1_Te_init,         # 7 - Electron temperature
         c1_A_D_init,        # 8 - Amplitude of dust
+        c1_v_init,          # 9 - Velocity
 
         # Cluster 2: Abell 399
-        c2_ra_init,         # 9 - Right Ascension
-        c2_dec_init,        # 10 - Declination
-        c2_beta_init,       # 11 - Beta
-        c2_rc_arcmin_init,  # 12 - Core radius (arcminutes)
-        c2_R_init,          # 13 - Radius
-        c2_theta_init,      # 14 - Theta
-        c2_Dtau_init,       # 15 - Optical depth
-        c2_Te_init,         # 16 - Electron temperature
-        c2_A_D_init,        # 17 - Amplitude of dust
+        c2_ra_init,         # 10 - Right Ascension
+        c2_dec_init,        # 11 - Declination
+        c2_beta_init,       # 12 - Beta
+        c2_rc_arcmin_init,  # 13 - Core radius (arcminutes)
+        c2_R_init,          # 14 - Radius
+        c2_theta_init,      # 15 - Theta
+        c2_Dtau_init,       # 16 - Optical depth
+        c2_Te_init,         # 17 - Electron temperature
+        c2_A_D_init,        # 18 - Amplitude of dust
+        c2_v_init,          # 19 - Velocity
 
         # Filament
-        fil_ra_init,        # 18 - Right Ascension
-        fil_dec_init,       # 19 - Declination
-        fil_l0_init,        # 20 - Length (pixels)
-        fil_w0_init,        # 21 - Width (pixels)
-        fil_Dtau_init,       # 22 - Optical depth
-        fil_Te_init,         # 23 - Electron temperature
-        fil_A_D_init,        # 24 - Amplitude of dust
+        fil_ra_init,        # 20 - Right Ascension
+        fil_dec_init,       # 21 - Declination
+        fil_l0_init,        # 22 - Length (pixels)
+        fil_w0_init,        # 23 - Width (pixels)
+        fil_Dtau_init,      # 24 - Optical depth
+        fil_Te_init,        # 25 - Electron temperature
+        fil_A_D_init,       # 26 - Amplitude of dust
 
-        # Average velocity
-        v_avg_init          # 25 - Average velocity
-        #v_delta_init       # 26 - Velocity difference (commented out)
-    ]).T
-    return ret_array
-            
-def lnprior(theta):    
-    """
-    Prior function for MCMC.
+        fil_v_init          # 27 - Velocity
 
-    Parameters
-    ----------
-    theta : array
-
-    Returns
-    -------
-    float : prior probability
-    """
-    check_c1 = (c1_ra_min_pix < theta[0] < c1_ra_max_pix
-                and c1_dec_min_pix < theta[1] < c1_dec_max_pix
-                and cf['c1_beta_min'] < theta[2] < cf['c1_beta_max']
-                and cf['c1_rc_arcmin_min'] < theta[3] < cf['c1_rc_arcmin_max']
-                and cf['c1_R_min'] < theta[4] < cf['c1_R_max']
-                and cf['c1_theta_min'] < theta[5] < cf['c1_theta_max']
-                and cf['c1_Dtau_min'] < theta[6] < cf['c1_Dtau_max']
-                and cf['c1_Te_min'] < theta[7] < cf['c1_Te_max']
-                and cf['c1_A_D_min'] < theta[8] < cf['c1_A_D_max'])
+        ]).T
+        return ret_array
     
-    check_c2 = (c2_ra_min_pix < theta[9] < c2_ra_max_pix
-                and c2_dec_min_pix < theta[10] < c2_dec_max_pix
-                and cf['c2_beta_min'] < theta[11] < cf['c2_beta_max']
-                and cf['c2_rc_arcmin_min'] < theta[12] < cf['c2_rc_arcmin_max']
-                and cf['c2_R_min'] < theta[13] < cf['c2_R_max']
-                and cf['c2_theta_min'] < theta[14] < cf['c2_theta_max']
-                and cf['c2_Dtau_min'] < theta[15] < cf['c2_Dtau_max']
-                and cf['c2_Te_min'] < theta[16] < cf['c2_Te_max']
-                and cf['c2_A_D_min'] < theta[17] < cf['c2_A_D_max'])
-    
-    check_fil = (fil_ra_min_pix < theta[18] < fil_ra_max_pix
-                and fil_dec_min_pix < theta[19] < fil_dec_max_pix
-                and fil_l0_min_pix < theta[20] < fil_l0_max_pix
-                and fil_w0_min_pix < theta[21] < fil_w0_max_pix
-                and cf['fil_Dtau_min'] < theta[22] < cf['fil_Dtau_max']
-                and cf['fil_Te_min'] < theta[23] < cf['fil_Te_max']
-                and cf['fil_A_D_min'] < theta[24] < cf['fil_A_D_max']
-                )
-    
-    check_v_avg = cf['v_avg_min'] < theta[25] < cf['v_avg_max']
-    #check_v_delta = cf['v_delta_min'] < theta[26] < cf['v_delta_max']
-    
-    if check_c1 and check_c2 and check_v_avg and check_fil:
-        term1 = -0.5 * ( (theta[7]-cf['c1_Te_mean'])**2. / cf['c1_Te_std']**2 )
-        term2 = -0.5 * ( (theta[16]-cf['c2_Te_mean'])**2. / cf['c2_Te_std']**2 )
-        term3 = -0.5 * ( (theta[23]-cf['fil_Te_mean'])**2. / cf['fil_Te_std']**2 )
-        return term1 + term2 + term3
     else:
-        return -np.inf
+        raise ValueError("Undefined model choice. Choose either 'fit_vavg' or 'fit_individual' in the config file.")
+
+def lnprior(theta):  
+
+    if cf["model_choice"] == "fit_vavg":  
+        check_c1 = (c1_ra_min_pix < theta[0] < c1_ra_max_pix
+                    and c1_dec_min_pix < theta[1] < c1_dec_max_pix
+                    and cf['c1_beta_min'] < theta[2] < cf['c1_beta_max']
+                    and cf['c1_rc_arcmin_min'] < theta[3] < cf['c1_rc_arcmin_max']
+                    and cf['c1_R_min'] < theta[4] < cf['c1_R_max']
+                    and cf['c1_theta_min'] < theta[5] < cf['c1_theta_max']
+                    and cf['c1_Dtau_min'] < theta[6] < cf['c1_Dtau_max']
+                    and cf['c1_Te_min'] < theta[7] < cf['c1_Te_max']
+                    and cf['c1_A_D_min'] < theta[8] < cf['c1_A_D_max'])
         
+        check_c2 = (c2_ra_min_pix < theta[9] < c2_ra_max_pix
+                    and c2_dec_min_pix < theta[10] < c2_dec_max_pix
+                    and cf['c2_beta_min'] < theta[11] < cf['c2_beta_max']
+                    and cf['c2_rc_arcmin_min'] < theta[12] < cf['c2_rc_arcmin_max']
+                    and cf['c2_R_min'] < theta[13] < cf['c2_R_max']
+                    and cf['c2_theta_min'] < theta[14] < cf['c2_theta_max']
+                    and cf['c2_Dtau_min'] < theta[15] < cf['c2_Dtau_max']
+                    and cf['c2_Te_min'] < theta[16] < cf['c2_Te_max']
+                    and cf['c2_A_D_min'] < theta[17] < cf['c2_A_D_max'])
+        
+        check_fil = (fil_ra_min_pix < theta[18] < fil_ra_max_pix
+                    and fil_dec_min_pix < theta[19] < fil_dec_max_pix
+                    and fil_l0_min_pix < theta[20] < fil_l0_max_pix
+                    and fil_w0_min_pix < theta[21] < fil_w0_max_pix
+                    and cf['fil_Dtau_min'] < theta[22] < cf['fil_Dtau_max']
+                    and cf['fil_Te_min'] < theta[23] < cf['fil_Te_max']
+                    and cf['fil_A_D_min'] < theta[24] < cf['fil_A_D_max']
+                    )
+        
+        check_v_avg = cf['v_avg_min'] < theta[25] < cf['v_avg_max']
+        
+        if check_c1 and check_c2 and check_v_avg and check_fil:
+            term1 = -0.5 * ( (theta[7]-cf['c1_Te_mean'])**2. / cf['c1_Te_std']**2 )
+            term2 = -0.5 * ( (theta[16]-cf['c2_Te_mean'])**2. / cf['c2_Te_std']**2 )
+            term3 = -0.5 * ( (theta[23]-cf['fil_Te_mean'])**2. / cf['fil_Te_std']**2 )
+            return term1 + term2 + term3
+        else:
+            return -np.inf
+    
+    elif cf["model_choice"] == "fit_individual":
+        check_c1 = (c1_ra_min_pix < theta[0] < c1_ra_max_pix
+                    and c1_dec_min_pix < theta[1] < c1_dec_max_pix
+                    and cf['c1_beta_min'] < theta[2] < cf['c1_beta_max']
+                    and cf['c1_rc_arcmin_min'] < theta[3] < cf['c1_rc_arcmin_max']
+                    and cf['c1_R_min'] < theta[4] < cf['c1_R_max']
+                    and cf['c1_theta_min'] < theta[5] < cf['c1_theta_max']
+                    and cf['c1_Dtau_min'] < theta[6] < cf['c1_Dtau_max']
+                    and cf['c1_Te_min'] < theta[7] < cf['c1_Te_max']
+                    and cf['c1_A_D_min'] < theta[8] < cf['c1_A_D_max']
+                    and cf['c1_v_min'] < theta[9] < cf['c1_v_max'])
+        
+        check_c2 = (c2_ra_min_pix < theta[10] < c2_ra_max_pix
+                    and c2_dec_min_pix < theta[11] < c2_dec_max_pix
+                    and cf['c2_beta_min'] < theta[12] < cf['c2_beta_max']
+                    and cf['c2_rc_arcmin_min'] < theta[13] < cf['c2_rc_arcmin_max']
+                    and cf['c2_R_min'] < theta[14] < cf['c2_R_max']
+                    and cf['c2_theta_min'] < theta[15] < cf['c2_theta_max']
+                    and cf['c2_Dtau_min'] < theta[16] < cf['c2_Dtau_max']
+                    and cf['c2_Te_min'] < theta[17] < cf['c2_Te_max']
+                    and cf['c2_A_D_min'] < theta[18] < cf['c2_A_D_max']
+                    and cf['c2_v_min'] < theta[19] < cf['c2_v_max'])
+        
+        check_fil = (fil_ra_min_pix < theta[20] < fil_ra_max_pix
+                    and fil_dec_min_pix < theta[21] < fil_dec_max_pix
+                    and fil_l0_min_pix < theta[22] < fil_l0_max_pix
+                    and fil_w0_min_pix < theta[23] < fil_w0_max_pix
+                    and cf['fil_Dtau_min'] < theta[24] < cf['fil_Dtau_max']
+                    and cf['fil_Te_min'] < theta[25] < cf['fil_Te_max']
+                    and cf['fil_A_D_min'] < theta[26] < cf['fil_A_D_max']
+                    and cf['fil_v_min'] < theta[27] < cf['fil_v_max'])
+        
+        if check_c1 and check_c2 and check_fil:
+            term1 = -0.5 * ( (theta[7]-cf['c1_Te_mean'])**2. / cf['c1_Te_std']**2 )
+            term2 = -0.5 * ( (theta[17]-cf['c2_Te_mean'])**2. / cf['c2_Te_std']**2 )
+            term3 = -0.5 * ( (theta[25]-cf['fil_Te_mean'])**2. / cf['fil_Te_std']**2 )
+            return term1 + term2 + term3
+        else:
+            return -np.inf
+
 @jit(nopython=True, parallel=False)
 def lnlike_loop(resid, icov):
     
@@ -198,9 +278,9 @@ def lnlike(theta):
     float : likelihood
     """
     
-    c1 = model.Cluster(theta=theta, name="abell401")
-    c2 = model.Cluster(theta=theta, name="abell399")
-    fil = model.Filament(theta=theta)
+    c1 = model.Cluster(theta=theta, name="abell401", model_choice=cf["model_choice"])
+    c2 = model.Cluster(theta=theta, name="abell399", model_choice=cf["model_choice"])
+    fil = model.Filament(theta=theta, model_choice=cf["model_choice"])
     
     resids = []
 
@@ -216,14 +296,16 @@ def lnlike(theta):
                               z=cf['c1_z'],
                               muo=cf['c1_muo'],
                               xgrid=xgrid, 
-                              ygrid=ygrid)
+                              ygrid=ygrid,
+                              ellipticity_type=cf["ellipticity_type"])
         
         c2_model = c2.szmodel(frequency=freq,
                                 array=array,
                                 z=cf['c2_z'],
                                 muo=cf['c2_muo'],
                                 xgrid=xgrid,
-                                ygrid=ygrid)
+                                ygrid=ygrid, 
+                                ellipticity_type=cf["ellipticity_type"])
         
         fil_model = fil.szmodel(frequency=freq,
                                 array=array,
