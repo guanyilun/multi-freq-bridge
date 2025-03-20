@@ -142,8 +142,8 @@ def process_combo_cov(combo,
         print(mean_tpsd.wcs)
         print("Fixing planck large ell noise")
 
-    if 0:
-    #if (combo[0] == combo[1] and (inst1 == 'act')):
+    #if 0:
+    if (combo[0] == combo[1] and (inst1 == 'act')):
         print(f"combo = {combo}")
         modlmap = enmap.modlmap(data_shape, data_wcs)
         # 1. taking mean power from tpsd in the range 5000-6000

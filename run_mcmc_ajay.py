@@ -272,7 +272,7 @@ def main():
 
     global cf
 
-    config_data_fname = "configs/config_mcmc.yaml"
+    config_data_fname = "configs/config_mcmc_ajay.yaml"
     
     try:
         cf = ut.get_config_file(config_data_fname)
