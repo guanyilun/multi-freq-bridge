@@ -228,7 +228,7 @@ def get_r500(z, mass):
     
 def flux_factor(array, freq):
     """
-    Returns Jy/K/sr
+    Returns Jy/uK/sr
     """
     if float(freq) < 100:
         frequency_tmp = str(int(freq))
