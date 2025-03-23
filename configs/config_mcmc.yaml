@@ -15,19 +15,19 @@ c1_dec_min: 13.5
 c1_dec_max: 13.65
 c1_muo: -0.5566122489553409
 c1_beta_min: 0.1
-c1_beta_max: 2
+c1_beta_max: 1.6
 c1_rc_arcmin_min: 0.1
 c1_rc_arcmin_max: 7
 c1_R_min: 0.2
 c1_R_max: 3
-c1_theta_min: 45
-c1_theta_max: 180.
+c1_theta_min: 70
+c1_theta_max: 150
 c1_Te_mean: 8.47
 c1_Te_std: 0.25
 c1_mass: 10.2
 c1_z: 0.073664
-c1_Te_min: 1
-c1_Te_max: 15
+c1_Te_min: 5
+c1_Te_max: 10
 c1_Dtau_min: 0
 c1_Dtau_max: 0.02
 c1_A_D_min: 0
@@ -41,7 +41,7 @@ c2_dec: 13.03
 # c2_dec: 13.0328
 
 c2_ra_min: 44.42
-c2_ra_max: 44.52
+c2_ra_max: 44.54
 c2_dec_min: 12.98
 c2_dec_max: 13.09
 
@@ -49,17 +49,17 @@ c2_muo: -0.5606024845891494
 c2_beta_min: 0.5
 c2_beta_max: 2.5
 c2_rc_arcmin_min: 0.1
-c2_rc_arcmin_max: 7
+c2_rc_arcmin_max: 10
 c2_R_min: 0.2
-c2_R_max: 3
+c2_R_max: 4
 c2_theta_min: 70
 c2_theta_max: 180.0
 c2_Te_mean: 7.23
 c2_Te_std: 0.19
 c2_mass: 8.7
 c2_z: 0.071806
-c2_Te_min: 1
-c2_Te_max: 15
+c2_Te_min: 5
+c2_Te_max: 10
 c2_Dtau_min: 0
 c2_Dtau_max: 0.02
 c2_A_D_min: 0
@@ -68,15 +68,15 @@ c2_A_D_max: 5000000
 # Filament
 fil_ra: 44.68
 fil_dec: 13.37
-fil_ra_min: 44.58
+fil_ra_min: 44.53
 fil_ra_max: 44.78
 fil_dec_min: 13.25
-fil_dec_max: 13.5
+fil_dec_max: 13.6
 fil_z: 0.072735
 fil_muo: -0.5576451231598584
 fil_z: 0.072735
 fil_l0_min_arcmin: 0
-fil_l0_max_arcmin: 30
+fil_l0_max_arcmin: 25
 fil_w0_min_arcmin: 0
 fil_w0_max_arcmin: 30
 fil_Dtau_min: 0
@@ -95,7 +95,7 @@ v_delta_max: 15000
 beam_version: "dr6v2"
 n_walkers: 100
 n_iter: 100000000
-mcmc_filename: run_test.h5
+mcmc_filename: chain.h5
 apod_pix: 20
 system_type: real
 noise_type: inst
@@ -132,9 +132,9 @@ data:
   - 98_pa5_act_dr6v2
   - 98_pa6_act_dr6v2
   - 150_pa6_act_dr6v2
-  # - 30_npipe_planck_sky
-  # - 44_npipe_planck_sky
-  # - 70_npipe_planck_sky
+  - 30_npipe_planck_sky
+  - 44_npipe_planck_sky
+  - 70_npipe_planck_sky
   - 100_npipe_planck_sky
   - 143_npipe_planck_sky
   - 217_npipe_planck_sky
