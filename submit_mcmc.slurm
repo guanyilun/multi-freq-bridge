@@ -1,16 +1,16 @@
 #!/bin/bash
-#PBS -N mcmc_ajay_case42
+#PBS -N mcmc_ajay_case68
 #PBS -o logs_ajay/mf_baseline.out
 #PBS -e logs_ajay/mf_baseline.err
-#PBS -l walltime=12:00:00
-#PBS -l nodes=1:ppn=32
-#PBS -q greenq
+#PBS -l walltime=4:00:00
+#PBS -l nodes=1:ppn=64
+#PBS -q starq
 
 cd $PBS_O_WORKDIR
 module load openmpi
 
 # name=case1_1
-name=case42 
+name=case68 
 prefix=baseline
 # config=configs/${name}.yaml
 odir=/fs/lustre/scratch/agill/run_ajay/${name}
