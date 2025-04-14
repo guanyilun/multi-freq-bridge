@@ -489,7 +489,7 @@ def main(config_data_fname, cov_dir=cov_dir, outdir=dir_base):
                 print(message)
                 sys.exit(-1)
 
-    print("All good!")
+    #print("All good!") 
 
     # Testing
 
