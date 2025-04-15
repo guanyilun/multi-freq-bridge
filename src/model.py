@@ -119,9 +119,13 @@ class Filament():
         dust_signal = numerator_dust / bandpass_int
 
         # modulate dust signal with bridge shape (mesa model)
-        total_model = bridge_shape * (sz_signal + dust_signal)
+        # total_model = bridge_shape * (sz_signal + dust_signal)
 
-        return total_model
+        sz_model = bridge_shape * sz_signal
+        dust_model = bridge_shape * dust_signal
+        total_model = sz_model + dust_model
+
+        return total_model, sz_model, dust_model
 
 class Cluster():
     """
@@ -230,9 +234,13 @@ class Cluster():
         
         dust_signal = numerator_dust / bandpass_int
 
-        total_model = beta_density_map_2d * (sz_signal + dust_signal)
+        # total_model = beta_density_map_2d * (sz_signal + dust_signal)
+
+        sz_model = beta_density_map_2d * sz_signal
+        dust_model = beta_density_map_2d * dust_signal
+        total_model = sz_model + dust_model
         
-        return total_model
+        return total_model, sz_model, dust_model
 
     def initialize(self, theta):
 
