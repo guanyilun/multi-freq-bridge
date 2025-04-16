@@ -43,12 +43,24 @@ def process_combo_cov(combo,
     scan2 = combo[1].split('_')[3]
 
     if inst1 == 'act':
-        data_dir1 = os.getenv("ACT_DATADIR")
+        if scan1 == 'dr6v2':
+            data_dir1 = os.getenv("ACT_DATADIR")
+        elif scan1 == 'dr6v4':
+            data_dir1 = "/fs/lustre/scratch/agill/dr6v4/"
+        else: 
+            raise ValueError("Invalid scan type")
+    
     elif inst1 == 'planck':
         data_dir1 = os.getenv("PLANCK_DATADIR")
     
     if inst2 == 'act':
-        data_dir2 = os.getenv("ACT_DATADIR")
+        if scan2 == 'dr6v2':
+            data_dir2 = os.getenv("ACT_DATADIR")
+        elif scan2 == 'dr6v4':
+            data_dir2 = "/fs/lustre/scratch/agill/dr6v4/"
+        else: 
+            raise ValueError("Invalid scan type")
+    
     elif inst2 == 'planck':
         data_dir2 = os.getenv("PLANCK_DATADIR")
 
