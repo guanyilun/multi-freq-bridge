@@ -125,7 +125,9 @@ class Filament():
         dust_model = bridge_shape * dust_signal
         total_model = sz_model + dust_model
 
-        return total_model, sz_model, dust_model
+        # return total_model, sz_model, dust_model
+    
+        return total_model
 
 class Cluster():
     """
@@ -240,7 +242,9 @@ class Cluster():
         dust_model = beta_density_map_2d * dust_signal
         total_model = sz_model + dust_model
         
-        return total_model, sz_model, dust_model, SZ_params, I_dust
+        
+        #return total_model, sz_model, dust_model, SZ_params, I_dust
+        return total_model
 
     def initialize(self, theta):
 
