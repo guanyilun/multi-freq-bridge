@@ -571,22 +571,22 @@ def main(config_data_fname, cov_dir=cov_dir, outdir=dir_base):
                                         pool=pool, 
                                         backend=backend)
 
-        # sampler.run_mcmc(initial_state=init_params, nsteps=cf['n_iter'])
-        nsteps = cf['n_iter']
-        if init_params is None:
-            init_params = sampler.backend.get_last_sample()
+        sampler.run_mcmc(initial_state=init_params, nsteps=cf['n_iter'], progress=True)
+        # nsteps = cf['n_iter']
+        # if init_params is None:
+        #     init_params = sampler.backend.get_last_sample()
 
-        for i, result in enumerate(sampler.sample(init_params, iterations=nsteps)):
-            # Calculate the iteration number based on the current sample
-            iteration = i + 1
+        # for i, result in enumerate(sampler.sample(init_params, iterations=nsteps)):
+        #     # Calculate the iteration number based on the current sample
+        #     iteration = i + 1
 
-            # Calculate acceptance fraction for the current step
-            acceptance_fraction = np.mean(sampler.acceptance_fraction)
+        #     # Calculate acceptance fraction for the current step
+        #     acceptance_fraction = np.mean(sampler.acceptance_fraction)
 
-            # Manually control the output to include acceptance fraction
-            if (iteration % 1 == 0 or iteration == nsteps):
-                # Print out the current iteration, total iterations, and acceptance fraction
-                print(f"Step: {iteration}/{nsteps}: acceptance fraction = {acceptance_fraction:.3f}", end="\r")
+        #     # Manually control the output to include acceptance fraction
+        #     if (iteration % 1 == 0 or iteration == nsteps):
+        #         # Print out the current iteration, total iterations, and acceptance fraction
+        #         print(f"Step: {iteration}/{nsteps}: acceptance fraction = {acceptance_fraction:.3f}", end="\r")
 
 if __name__ == "__main__":
     import argparse

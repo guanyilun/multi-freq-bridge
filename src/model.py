@@ -240,7 +240,7 @@ class Cluster():
         dust_model = beta_density_map_2d * dust_signal
         total_model = sz_model + dust_model
         
-        return total_model, sz_model, dust_model
+        return total_model, sz_model, dust_model, SZ_params, I_dust
 
     def initialize(self, theta):
 
