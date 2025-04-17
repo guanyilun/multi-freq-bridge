@@ -46,7 +46,8 @@ def process_combo_cov(combo,
         if scan1 == 'dr6v2':
             data_dir1 = os.getenv("ACT_DATADIR")
         elif scan1 == 'dr6v4':
-            data_dir1 = "/fs/lustre/scratch/agill/dr6v4/"
+            #data_dir1 = "/fs/lustre/scratch/agill/dr6v4/"
+            data_dir1 = "/home/gill/research/ACT/bridge/dr6v4/"
         else: 
             raise ValueError("Invalid scan type")
     
@@ -57,7 +58,8 @@ def process_combo_cov(combo,
         if scan2 == 'dr6v2':
             data_dir2 = os.getenv("ACT_DATADIR")
         elif scan2 == 'dr6v4':
-            data_dir2 = "/fs/lustre/scratch/agill/dr6v4/"
+            #data_dir2 = "/fs/lustre/scratch/agill/dr6v4/"
+            data_dir2 = "/home/gill/research/ACT/bridge/dr6v4/"
         else: 
             raise ValueError("Invalid scan type")
     

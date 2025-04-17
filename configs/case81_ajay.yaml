@@ -85,7 +85,7 @@ v_avg_min: -10000
 v_avg_max: 10000
 v_delta_min: -15000
 v_delta_max: 15000
-beam_version: "dr6v4"
+beam_version: "dr6v2"
 n_walkers: 100
 n_iter: 100000000
 mcmc_filename: chain.h5
@@ -121,19 +121,19 @@ repeat_h5: "true"
 model_choice: "fit_vavg"
 ellipticity_type: "numerator"
 data:
-  # - 150_pa4_act_dr6v2
-  # - 220_pa4_act_dr6v2
-  # - 150_pa5_act_dr6v2
-  # - 98_pa5_act_dr6v2
-  # - 98_pa6_act_dr6v2
-  # - 150_pa6_act_dr6v2
+  - 150_pa4_act_dr6v2
+  - 220_pa4_act_dr6v2
+  - 150_pa5_act_dr6v2
+  - 98_pa5_act_dr6v2
+  - 98_pa6_act_dr6v2
+  - 150_pa6_act_dr6v2
 
-  - 150_pa4_act_dr6v4
-  - 220_pa4_act_dr6v4
-  - 150_pa5_act_dr6v4
-  - 98_pa5_act_dr6v4
-  - 98_pa6_act_dr6v4
-  - 150_pa6_act_dr6v4
+  # - 150_pa4_act_dr6v4
+  # - 220_pa4_act_dr6v4
+  # - 150_pa5_act_dr6v4
+  # - 98_pa5_act_dr6v4
+  # - 98_pa6_act_dr6v4
+  # - 150_pa6_act_dr6v4
 
   - 30_npipe_planck_sky
   - 44_npipe_planck_sky

@@ -62,6 +62,8 @@ def get_covariance(freq1,
     coadd1_str = f"{data_dir1}*{array1}*{freq1}*coadd*map{data_str_flag}.fits"
     coadd2_str = f"{data_dir2}*{array2}*{freq2}*coadd*map{data_str_flag}.fits"
 
+    print(coadd1_str)
+
     coadd1 = np.sort(glob(coadd1_str))
     coadd2 = np.sort(glob(coadd2_str))
 
@@ -207,14 +209,17 @@ def get_covariance(freq1,
         # SIGNAL COVARIANCE
         apod_mask1 = (enmap.apod(coadd1_map*0+1, cf['apod_pix']))
         coadd1_map_apod = coadd1_map * apod_mask1
-        coadd1_map_norm = np.fft.fft2(coadd1_map_apod) 
+        # coadd1_map_norm = np.fft.fft2(coadd1_map_apod) 
+        coadd1_map_norm = np.fft.fft2(coadd1_map_apod) / np.mean(apod_mask1) # old way
 
         apod_mask2 = (enmap.apod(coadd2_map*0+1, cf['apod_pix']))
         coadd2_map_apod = coadd2_map * apod_mask2
-        coadd2_map_norm = np.fft.fft2(coadd2_map_apod) 
+        #coadd2_map_norm = np.fft.fft2(coadd2_map_apod)
+        coadd2_map_norm = np.fft.fft2(coadd2_map_apod) / np.mean(apod_mask2) # old way
 
-        spsd = coadd1_map_norm * np.conjugate(coadd2_map_norm) / np.mean(apod_mask1 * apod_mask2)
-
+        # spsd = coadd1_map_norm * np.conjugate(coadd2_map_norm) / np.mean(apod_mask1 * apod_mask2)
+        spsd = coadd1_map_norm * np.conjugate(coadd2_map_norm)
+        
         if cf['apply_region_weight']:
             spsd *= region_weight
 

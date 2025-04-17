@@ -1,10 +1,13 @@
 import numpy as np
 import warnings
 import utils as ut
+import sys
 
 warnings.filterwarnings('ignore')
-
+sys.path.insert(0, '/home/gill/apps/szpack/python')
 import SZpack as SZ 
+
+print(SZ)
 
 const_c = 299792458.0 # m / s
 const_k_B = 1.380649e-23 # J / K
