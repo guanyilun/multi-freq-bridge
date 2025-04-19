@@ -7,7 +7,7 @@
 #PBS -q starq
 
 cd $PBS_O_WORKDIR
-# module load miniconda
+module load miniconda
 module load python/3.10.2
 module load intel
 module load openmpi
