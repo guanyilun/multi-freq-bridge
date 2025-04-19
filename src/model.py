@@ -7,8 +7,6 @@ warnings.filterwarnings('ignore')
 #sys.path.insert(0, '/home/gill/apps/szpack/python')
 import SZpack as SZ 
 
-print(SZ)
-
 const_c = 299792458.0 # m / s
 const_k_B = 1.380649e-23 # J / K
 const_h = 6.626070149999999e-25 # J / GHz
@@ -128,9 +126,9 @@ class Filament():
         dust_model = bridge_shape * dust_signal
         total_model = sz_model + dust_model
 
-        return total_model, sz_model, dust_model
+        #return total_model, sz_model, dust_model
     
-        #return total_model
+        return total_model
 
 class Cluster():
     """
@@ -246,8 +244,9 @@ class Cluster():
         total_model = sz_model + dust_model
         
         
-        return total_model, sz_model, dust_model, SZ_params, I_dust
-        #return total_model
+        #return total_model, sz_model, dust_model, SZ_params, I_dust
+        
+        return total_model
 
     def initialize(self, theta):
 
