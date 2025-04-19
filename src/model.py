@@ -4,7 +4,7 @@ import utils as ut
 import sys
 
 warnings.filterwarnings('ignore')
-sys.path.insert(0, '/home/gill/apps/szpack/python')
+#sys.path.insert(0, '/home/gill/apps/szpack/python')
 import SZpack as SZ 
 
 print(SZ)
