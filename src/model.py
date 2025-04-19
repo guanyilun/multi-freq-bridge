@@ -12,6 +12,8 @@ sys.path.insert(0, os.getenv("SZPACK_DIR"))
 
 import SZpack as SZ 
 
+print(SZ)
+
 const_c = 299792458.0 # m / s
 const_k_B = 1.380649e-23 # J / K
 const_h = 6.626070149999999e-25 # J / GHz
