@@ -1,10 +1,15 @@
 import numpy as np
 import warnings
 import utils as ut
-import sys
+import sys, os
+
+from dotenv import load_dotenv
+load_dotenv()
 
 warnings.filterwarnings('ignore')
-#sys.path.insert(0, '/home/gill/apps/szpack/python')
+
+sys.path.insert(0, os.getenv("SZPACK_DIR"))
+
 import SZpack as SZ 
 
 const_c = 299792458.0 # m / s
