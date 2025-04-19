@@ -16,7 +16,7 @@ name=case1
 prefix=baseline
 # config=configs/${name}.yaml
 # odir=/home/agill/multi-freq-bridge/run_ajay/${name}
-odir=/fs/lustre/scratch/agill/run_ajay/${name}
+odir=/fs/lustre/scratch/agill/run_ajay_new/${name}
 cov=${odir}/cov
 config=configs/${name}_ajay.yaml
 
