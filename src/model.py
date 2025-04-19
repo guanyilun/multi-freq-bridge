@@ -244,7 +244,7 @@ class Cluster():
         total_model = sz_model + dust_model
         
         
-        #return total_model, sz_model, dust_model, SZ_params, I_dust
+        # return totsal_model, sz_model, dust_model, SZ_params, I_dust
         
         return total_model
 
