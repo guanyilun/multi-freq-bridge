@@ -8,11 +8,11 @@ load_dotenv()
 
 warnings.filterwarnings('ignore')
 
-sys.path.insert(0, os.getenv("SZPACK_DIR"))
+# sys.path.insert(0, os.getenv("SZPACK_DIR"))
 
 import SZpack as SZ 
 
-print(SZ)
+# print(SZ)
 
 const_c = 299792458.0 # m / s
 const_k_B = 1.380649e-23 # J / K
