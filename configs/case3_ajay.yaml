@@ -3,10 +3,10 @@ region_center_dec: 13.2999979
 region_width: 2.25 # degrees
 
 # Cluster 1
-c1_ra: 44.751 # degrees
-c1_dec: 13.572
-#c1_ra: 44.742
-#c1_dec: 13.594
+#c1_ra: 44.751 # degrees
+#c1_dec: 13.572
+c1_ra: 44.742
+c1_dec: 13.594
 c1_ra_min: 44.651
 c1_ra_max: 44.851
 c1_dec_min: 13.472
@@ -32,10 +32,10 @@ c1_A_D_min: 0
 c1_A_D_max: 1000000
 
 # Cluster 2
-c2_ra: 44.473  # hincks et al.
-c2_dec: 13.03
-# c2_ra: 44.464
-# c2_dec: 13.0328
+#c2_ra: 44.473  # hincks et al.
+#c2_dec: 13.03
+c2_ra: 44.464
+c2_dec: 13.0328
 c2_ra_min: 44.373
 c2_ra_max: 44.573
 c2_dec_min: 12.93
