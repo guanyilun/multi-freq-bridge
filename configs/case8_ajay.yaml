@@ -114,6 +114,8 @@ whiten_act: true
 use_cluster_only_for_noise: false
 # Miscellaneaus parameters
 temp_model_type: isothermal
+model_choice: "fit_vavg"
+ellipticity_type: "numerator"
 repeat_h5: "true"
 data:
   - 150_pa4_act_dr6v2
