@@ -1,10 +1,10 @@
 #!/bin/bash
-#PBS -N mcmc_ajay_case9
+#PBS -N mcmc_ajay_case10
 #PBS -o logs_ajay/mf_baseline.out
 #PBS -e logs_ajay/mf_baseline.err
-#PBS -l walltime=12:00:00
-#PBS -l nodes=1:ppn=48
-#PBS -q starq
+#PBS -l walltime=14:00:00
+#PBS -l nodes=2:ppn=16
+#PBS -q sandyq
 
 cd $PBS_O_WORKDIR
 module load miniconda
@@ -12,7 +12,7 @@ module load miniconda
 module load intel
 module load openmpi
 
-name=case9
+name=case10
 prefix=baseline
 # config=configs/${name}.yaml
 # odir=/home/agill/multi-freq-bridge/run_ajay/${name}
@@ -29,4 +29,4 @@ echo "Making covariance matrix"
 python cov_maker.py --config ${config} --cov ${cov} 
 
 echo "Running MCMC"
-mpirun -n 48 python run_mcmc.py --config ${config} --cov ${cov} --odir ${odir}
+mpirun -n 32 python run_mcmc.py --config ${config} --cov ${cov} --odir ${odir}
