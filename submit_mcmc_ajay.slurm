@@ -3,8 +3,8 @@
 #PBS -o logs_ajay/mf_baseline.out
 #PBS -e logs_ajay/mf_baseline.err
 #PBS -l walltime=14:00:00
-#PBS -l nodes=2:ppn=16
-#PBS -q sandyq
+#PBS -l nodes=1:ppn=48
+#PBS -q starq
 
 cd $PBS_O_WORKDIR
 module load miniconda
@@ -29,4 +29,4 @@ echo "Making covariance matrix"
 python cov_maker.py --config ${config} --cov ${cov} 
 
 echo "Running MCMC"
-mpirun -n 32 python run_mcmc.py --config ${config} --cov ${cov} --odir ${odir}
+mpirun -n 48 python run_mcmc.py --config ${config} --cov ${cov} --odir ${odir}
