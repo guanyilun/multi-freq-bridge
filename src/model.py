@@ -310,3 +310,30 @@ class Cluster():
             else:
                 raise ValueError("Invalid cluster name.")
 
+class PointSource():
+    def __init__(self, amplitude, ra_pix, dec_pix):
+        self.amplitude = amplitude
+        self.ra_pix = ra_pix
+        self.dec_pix = dec_pix
+    
+    def model(self, 
+                frequency, 
+                array,
+                data_shape):
+        
+        # Get frequency and bandpass arrays
+        freq_str = ut.get_freq_str(frequency=frequency)
+        _, freq_array, del_freq = ut.get_freq_bandpass(array=array, freq_str=freq_str)
+        bandpass, bandpass_int = ut.get_bandpass(array=array, freq_str=freq_str)
+
+        numerator = np.trapz(y=bandpass * self.amplitude,
+                             x=freq_array, dx=del_freq)
+        
+        signal = numerator / bandpass_int
+
+        ps_map = np.zeros(data_shape)
+        ps_map[int(self.dec_pix), int(self.ra_pix)] = signal
+
+        return ps_map
+
+

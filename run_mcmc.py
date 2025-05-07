@@ -85,9 +85,13 @@ def get_initial_params(cf, n_walkers):
     # average velocity
     vavg_init = np.random.uniform(cf['v_avg_min'], cf['v_avg_max'], size=n_walkers)
 
+    # Point sources
+    ps1_A_init = np.random.uniform(cf['ps1_A_min'], cf['ps1_A_max'], size=n_walkers)
+
     if cf["model_choice"] == "fit_vavg":
         # fits average velocity only
         ret_array = np.array([
+            
             # Cluster 1: Abell 401
             c1_ra_init,         # 0 - Right Ascension
             c1_dec_init,        # 1 - Declination
@@ -119,7 +123,10 @@ def get_initial_params(cf, n_walkers):
             fil_Te_init,        # 23 - Electron temperature
             fil_A_D_init,       # 24 - Amplitude of dust
 
-            vavg_init           # 25 - Velocity
+            vavg_init,           # 25 - Velocity
+
+            # Point sources
+            ps1_A_init          # 26 - Point source amplitude
 
         ]).T
 
@@ -204,11 +211,14 @@ def lnprior(theta):
                     )
         
         check_v_avg = cf['v_avg_min'] < theta[25] < cf['v_avg_max']
+
+        check_ps1 = cf['ps1_A_min'] < theta[26] < cf['ps1_A_max']
         
-        if check_c1 and check_c2 and check_v_avg and check_fil:
+        if check_c1 and check_c2 and check_v_avg and check_fil and check_ps1:
             term1 = -0.5 * ( (theta[7]-cf['c1_Te_mean'])**2. / cf['c1_Te_std']**2 )
             term2 = -0.5 * ( (theta[16]-cf['c2_Te_mean'])**2. / cf['c2_Te_std']**2 )
             term3 = -0.5 * ( (theta[23]-cf['fil_Te_mean'])**2. / cf['fil_Te_std']**2 )
+
             return term1 + term2 + term3
         else:
             return -np.inf
@@ -281,6 +291,7 @@ def lnlike(theta):
     c1 = model.Cluster(theta=theta, name="abell401", model_choice=cf["model_choice"])
     c2 = model.Cluster(theta=theta, name="abell399", model_choice=cf["model_choice"])
     fil = model.Filament(theta=theta, model_choice=cf["model_choice"])
+    ps1 = model.PointSource(amplitude=theta[26], ra_pix=ps1_ra_pix, dec_pix=ps1_dec_pix)
     
     resids = []
 
@@ -314,7 +325,11 @@ def lnlike(theta):
                                 z=cf['fil_z'],
                                 muo=cf['fil_muo'])
         
-        fit_model = np.fft.fft2(c1_model + c2_model + fil_model) * beam_list_array[idx]
+        ps1_model = ps1.model(frequency=freq,
+                              array=array, 
+                              data_shape=xgrid.shape)
+        
+        fit_model = np.fft.fft2(c1_model + c2_model + fil_model + ps1_model) * beam_list_array[idx]
         
         resid_loop = data_list_array[idx].ravel() - fit_model.ravel()
         
@@ -350,6 +365,8 @@ def main(config_data_fname, cov_dir=cov_dir, outdir=dir_base):
     global fil_ra_min_pix, fil_ra_max_pix, fil_dec_min_pix, fil_dec_max_pix
     global fil_l0_min_pix, fil_l0_max_pix, fil_w0_min_pix, fil_w0_max_pix
     global fil_ra_pix, fil_dec_pix
+
+    global ps1_ra_pix, ps1_dec_pix
 
     global apod_mask, mean_apod_mask
 
@@ -535,6 +552,10 @@ def main(config_data_fname, cov_dir=cov_dir, outdir=dir_base):
     fil_l0_max_pix = cf['fil_l0_max_arcmin'] / 0.5  # arcmin/pix
     fil_w0_min_pix = cf['fil_w0_min_arcmin'] / 0.5  # arcmin/pix
     fil_w0_max_pix = cf['fil_w0_max_arcmin'] / 0.5  # arcmin/pix 
+
+    # Point sources
+    ps1_ra_pix = data_wcs.celestial.wcs_world2pix(cf['ps1_ra'], cf['ps1_dec'], 0)[0]
+    ps1_dec_pix = data_wcs.celestial.wcs_world2pix(cf['ps1_ra'], cf['ps1_dec'], 0)[1]
 
     mcmc_filepath = f"{outdir}/{cf['mcmc_filename']}"
     if rank == 0:
