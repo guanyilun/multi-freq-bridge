@@ -118,20 +118,20 @@ model_choice: "fit_vavg"
 ellipticity_type: "numerator"
 repeat_h5: "true"
 data:
-  - 150_pa4_act_dr6v2
-  - 220_pa4_act_dr6v2
+  # - 150_pa4_act_dr6v2
+  # - 220_pa4_act_dr6v2
   - 150_pa5_act_dr6v2
   - 98_pa5_act_dr6v2
   - 98_pa6_act_dr6v2
   - 150_pa6_act_dr6v2
-  - 30_npipe_planck_sky
-  - 44_npipe_planck_sky
-  - 70_npipe_planck_sky
-  - 100_npipe_planck_sky
-  - 143_npipe_planck_sky
-  - 217_npipe_planck_sky
-  - 353_npipe_planck_sky
-  - 545_npipe_planck_sky
+  # - 30_npipe_planck_sky
+  # - 44_npipe_planck_sky
+  # - 70_npipe_planck_sky
+  # - 100_npipe_planck_sky
+  # - 143_npipe_planck_sky
+  # - 217_npipe_planck_sky
+  # - 353_npipe_planck_sky
+  # - 545_npipe_planck_sky
 
 # Point sources
 ps1_ra: 44.5446940
