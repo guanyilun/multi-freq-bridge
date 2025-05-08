@@ -133,9 +133,9 @@ class Filament():
         dust_model = bridge_shape * dust_signal
         total_model = sz_model + dust_model
 
-        return total_model, sz_model, dust_model
+        #return total_model, sz_model, dust_model
     
-        #return total_model
+        return total_model
 
 class Cluster():
     """
@@ -251,9 +251,9 @@ class Cluster():
         total_model = sz_model + dust_model
         
         
-        return total_model, sz_model, dust_model, SZ_params, I_dust
+        #return total_model, sz_model, dust_model, SZ_params, I_dust
         
-        #return total_model
+        return total_model
 
     def initialize(self, theta):
 
@@ -311,20 +311,34 @@ class Cluster():
                 raise ValueError("Invalid cluster name.")
 
 class PointSource():
-    def __init__(self, amplitude, ra_pix, dec_pix):
-        self.amplitude = amplitude
+    def __init__(self, theta, ra_pix, dec_pix):
         self.ra_pix = ra_pix
         self.dec_pix = dec_pix
+
+        self.amplitude_lookup = {
+            "150_pa5": theta[26],
+            "98_pa5": theta[27],
+            "150_pa6": theta[28],
+            "98_pa6": theta[29]
+                                }
     
     def model(self, 
-                frequency, 
-                array,
-                data_shape):
+              frequency, 
+              array,
+              data_shape):
         
         # Get frequency and bandpass arrays
         freq_str = ut.get_freq_str(frequency=frequency)
         _, freq_array, del_freq = ut.get_freq_bandpass(array=array, freq_str=freq_str)
         bandpass, bandpass_int = ut.get_bandpass(array=array, freq_str=freq_str)
+
+        # Get amplitude
+        array_freq = f"{int(frequency)}_{array}"
+
+        if array_freq not in self.amplitude_lookup:
+            raise ValueError(f"Invalid frequency and array combination: {array_freq}.")
+
+        self.amplitude = self.amplitude_lookup[array_freq]
 
         numerator = np.trapz(y=bandpass * self.amplitude,
                              x=freq_array, dx=del_freq)
@@ -335,5 +349,7 @@ class PointSource():
         ps_map[int(self.dec_pix), int(self.ra_pix)] = signal
 
         return ps_map
+
+
 
 

@@ -86,7 +86,10 @@ def get_initial_params(cf, n_walkers):
     vavg_init = np.random.uniform(cf['v_avg_min'], cf['v_avg_max'], size=n_walkers)
 
     # Point sources
-    ps1_A_init = np.random.uniform(cf['ps1_A_min'], cf['ps1_A_max'], size=n_walkers)
+    ps1_A_150_pa5_init = np.random.uniform(cf['ps1_A_min'], cf['ps1_A_max'], size=n_walkers)
+    ps1_A_98_pa5_init = np.random.uniform(cf['ps1_A_min'], cf['ps1_A_max'], size=n_walkers)
+    ps1_A_150_pa6_init = np.random.uniform(cf['ps1_A_min'], cf['ps1_A_max'], size=n_walkers)
+    ps1_A_98_pa6_init = np.random.uniform(cf['ps1_A_min'], cf['ps1_A_max'], size=n_walkers)
 
     if cf["model_choice"] == "fit_vavg":
         # fits average velocity only
@@ -123,58 +126,17 @@ def get_initial_params(cf, n_walkers):
             fil_Te_init,        # 23 - Electron temperature
             fil_A_D_init,       # 24 - Amplitude of dust
 
-            vavg_init,           # 25 - Velocity
+            vavg_init,          # 25 - Velocity
 
             # Point sources
-            ps1_A_init          # 26 - Point source amplitude
+            ps1_A_150_pa5_init,         # 26 - Point source amplitude
+            ps1_A_98_pa5_init,          # 27 - Point source amplitude
+            ps1_A_150_pa6_init,         # 28 - Point source amplitude
+            ps1_A_98_pa6_init           # 29 - Point source amplitude
 
         ]).T
 
         return ret_array
-
-    elif cf["model_choice"] == "fit_individual":    
-        # fits individual cluster and filament velocities    
-        # Define the initial parameter array with indices
-        ret_array = np.array([
-
-        # Cluster 1: Abell 401
-        c1_ra_init,         # 0 - Right Ascension
-        c1_dec_init,        # 1 - Declination
-        c1_beta_init,       # 2 - Beta
-        c1_rc_arcmin_init,  # 3 - Core radius (arcminutes)
-        c1_R_init,          # 4 - Radius
-        c1_theta_init,      # 5 - Theta
-        c1_Dtau_init,       # 6 - Optical depth
-        c1_Te_init,         # 7 - Electron temperature
-        c1_A_D_init,        # 8 - Amplitude of dust
-        c1_v_init,          # 9 - Velocity
-
-        # Cluster 2: Abell 399
-        c2_ra_init,         # 10 - Right Ascension
-        c2_dec_init,        # 11 - Declination
-        c2_beta_init,       # 12 - Beta
-        c2_rc_arcmin_init,  # 13 - Core radius (arcminutes)
-        c2_R_init,          # 14 - Radius
-        c2_theta_init,      # 15 - Theta
-        c2_Dtau_init,       # 16 - Optical depth
-        c2_Te_init,         # 17 - Electron temperature
-        c2_A_D_init,        # 18 - Amplitude of dust
-        c2_v_init,          # 19 - Velocity
-
-        # Filament
-        fil_ra_init,        # 20 - Right Ascension
-        fil_dec_init,       # 21 - Declination
-        fil_l0_init,        # 22 - Length (pixels)
-        fil_w0_init,        # 23 - Width (pixels)
-        fil_Dtau_init,      # 24 - Optical depth
-        fil_Te_init,        # 25 - Electron temperature
-        fil_A_D_init,       # 26 - Amplitude of dust
-
-        fil_v_init          # 27 - Velocity
-
-        ]).T
-        return ret_array
-    
     else:
         raise ValueError("Undefined model choice. Choose either 'fit_vavg' or 'fit_individual' in the config file.")
 
@@ -212,7 +174,10 @@ def lnprior(theta):
         
         check_v_avg = cf['v_avg_min'] < theta[25] < cf['v_avg_max']
 
-        check_ps1 = cf['ps1_A_min'] < theta[26] < cf['ps1_A_max']
+        check_ps1 =    (cf['ps1_A_min'] < theta[26] < cf['ps1_A_max']
+                    and cf['ps1_A_min'] < theta[27] < cf['ps1_A_max']
+                    and cf['ps1_A_min'] < theta[28] < cf['ps1_A_max']
+                    and cf['ps1_A_min'] < theta[29] < cf['ps1_A_max'])
         
         if check_c1 and check_c2 and check_v_avg and check_fil and check_ps1:
             term1 = -0.5 * ( (theta[7]-cf['c1_Te_mean'])**2. / cf['c1_Te_std']**2 )
@@ -223,55 +188,13 @@ def lnprior(theta):
         else:
             return -np.inf
     
-    elif cf["model_choice"] == "fit_individual":
-        check_c1 = (c1_ra_min_pix < theta[0] < c1_ra_max_pix
-                    and c1_dec_min_pix < theta[1] < c1_dec_max_pix
-                    and cf['c1_beta_min'] < theta[2] < cf['c1_beta_max']
-                    and cf['c1_rc_arcmin_min'] < theta[3] < cf['c1_rc_arcmin_max']
-                    and cf['c1_R_min'] < theta[4] < cf['c1_R_max']
-                    and cf['c1_theta_min'] < theta[5] < cf['c1_theta_max']
-                    and cf['c1_Dtau_min'] < theta[6] < cf['c1_Dtau_max']
-                    and cf['c1_Te_min'] < theta[7] < cf['c1_Te_max']
-                    and cf['c1_A_D_min'] < theta[8] < cf['c1_A_D_max']
-                    and cf['c1_v_min'] < theta[9] < cf['c1_v_max'])
-        
-        check_c2 = (c2_ra_min_pix < theta[10] < c2_ra_max_pix
-                    and c2_dec_min_pix < theta[11] < c2_dec_max_pix
-                    and cf['c2_beta_min'] < theta[12] < cf['c2_beta_max']
-                    and cf['c2_rc_arcmin_min'] < theta[13] < cf['c2_rc_arcmin_max']
-                    and cf['c2_R_min'] < theta[14] < cf['c2_R_max']
-                    and cf['c2_theta_min'] < theta[15] < cf['c2_theta_max']
-                    and cf['c2_Dtau_min'] < theta[16] < cf['c2_Dtau_max']
-                    and cf['c2_Te_min'] < theta[17] < cf['c2_Te_max']
-                    and cf['c2_A_D_min'] < theta[18] < cf['c2_A_D_max']
-                    and cf['c2_v_min'] < theta[19] < cf['c2_v_max'])
-        
-        check_fil = (fil_ra_min_pix < theta[20] < fil_ra_max_pix
-                    and fil_dec_min_pix < theta[21] < fil_dec_max_pix
-                    and fil_l0_min_pix < theta[22] < fil_l0_max_pix
-                    and fil_w0_min_pix < theta[23] < fil_w0_max_pix
-                    and cf['fil_Dtau_min'] < theta[24] < cf['fil_Dtau_max']
-                    and cf['fil_Te_min'] < theta[25] < cf['fil_Te_max']
-                    and cf['fil_A_D_min'] < theta[26] < cf['fil_A_D_max']
-                    and cf['fil_v_min'] < theta[27] < cf['fil_v_max'])
-        
-        if check_c1 and check_c2 and check_fil:
-            term1 = -0.5 * ( (theta[7]-cf['c1_Te_mean'])**2. / cf['c1_Te_std']**2 )
-            term2 = -0.5 * ( (theta[17]-cf['c2_Te_mean'])**2. / cf['c2_Te_std']**2 )
-            term3 = -0.5 * ( (theta[25]-cf['fil_Te_mean'])**2. / cf['fil_Te_std']**2 )
-            return term1 + term2 + term3
-        else:
-            return -np.inf
-
 @jit(nopython=True, parallel=False)
 def lnlike_loop(resid, icov):
     
     like_loop = 0
     
     for idx in range(npix):
-        # norm = np.log(np.linalg.det(icov[idx, :, :])).real
         like_loop += (-0.5 * (np.conj(resid[idx, :]) @ icov[idx, :, :] @ resid[idx, :].T)).real
-        # like_loop += -0.5 * norm
     
     return like_loop
 
@@ -291,7 +214,7 @@ def lnlike(theta):
     c1 = model.Cluster(theta=theta, name="abell401", model_choice=cf["model_choice"])
     c2 = model.Cluster(theta=theta, name="abell399", model_choice=cf["model_choice"])
     fil = model.Filament(theta=theta, model_choice=cf["model_choice"])
-    ps1 = model.PointSource(amplitude=theta[26], ra_pix=ps1_ra_pix, dec_pix=ps1_dec_pix)
+    ps1 = model.PointSource(theta=theta,ra_pix=ps1_ra_pix, dec_pix=ps1_dec_pix)
     
     resids = []
 
@@ -299,8 +222,6 @@ def lnlike(theta):
         data_str = cf['data'][idx]
         freq = float(data_str.split('_')[0])
         array = data_str.split('_')[1]
-        #inst = data_str.split('_')[2]
-        #scan = data_str.split('_')[3]
         
         c1_model = c1.szmodel(frequency=freq, 
                               array=array, 
@@ -487,16 +408,6 @@ def main(config_data_fname, cov_dir=cov_dir, outdir=dir_base):
     if test_cov:
         for idx in range(npix):
             cov_idx = np.array( cov[idx, :, :] )
-            # cov_idx_real = np.array( cov_real[idx, :, :] )
-
-            # print_matrix_pretty(cov_idx)
-            # print_matrix_pretty(cov_idx_real)
-
-           # is_valid_real, message = ut.check_real_covariance(cov_idx_real)
-
-            # if not is_valid_real:
-            #     print(f"Real check fail: Index: {idx}")
-            #     print(message)
 
             is_valid_complex, message = ut.check_complex_covariance(cov_idx)
 
@@ -505,21 +416,6 @@ def main(config_data_fname, cov_dir=cov_dir, outdir=dir_base):
                 print(f"Complex check fail: Index: {idx}")
                 print(message)
                 sys.exit(-1)
-
-    #print("All good!") 
-
-    # Testing
-
-    # temp
-    # covar_array = np.array(covar_list).T.reshape(npix, nmaps, nmaps)
-    # icov = np.zeros_like(covar_array)
-
-    # for i in range(npix):
-    #     U, s, Vh = scipy.linalg.svd(covar_array[i])
-    #     s_inv = 1 / s
-    #     # icov[i] = np.dot(Vh.T @ np.diag(s_inv), U.T)
-    #     icov[i] = Vh.T @ np.diag(s_inv) @ U.T
-    # # end temp
 
     xgrid, ygrid = np.meshgrid(np.arange(0, data_shape[1], 1), 
                                np.arange(0, data_shape[0], 1))
@@ -563,11 +459,6 @@ def main(config_data_fname, cov_dir=cov_dir, outdir=dir_base):
             os.makedirs(f"{outdir}")
     comm.Barrier()
 
-    # save config_data to run_name directory
-    # if rank == 0:
-    #     config_file_path = f"{outdir}/config.yaml"
-    #     ut.save_config_file(config_file_path, cf)
-
     print("MCMC file path: ", mcmc_filepath)
 
     if os.path.exists(mcmc_filepath) and cf['repeat_h5'] == 'true':
@@ -593,21 +484,6 @@ def main(config_data_fname, cov_dir=cov_dir, outdir=dir_base):
                                         backend=backend)
 
         sampler.run_mcmc(initial_state=init_params, nsteps=cf['n_iter'], progress=True)
-        # nsteps = cf['n_iter']
-        # if init_params is None:
-        #     init_params = sampler.backend.get_last_sample()
-
-        # for i, result in enumerate(sampler.sample(init_params, iterations=nsteps)):
-        #     # Calculate the iteration number based on the current sample
-        #     iteration = i + 1
-
-        #     # Calculate acceptance fraction for the current step
-        #     acceptance_fraction = np.mean(sampler.acceptance_fraction)
-
-        #     # Manually control the output to include acceptance fraction
-        #     if (iteration % 1 == 0 or iteration == nsteps):
-        #         # Print out the current iteration, total iterations, and acceptance fraction
-        #         print(f"Step: {iteration}/{nsteps}: acceptance fraction = {acceptance_fraction:.3f}", end="\r")
 
 if __name__ == "__main__":
     import argparse
