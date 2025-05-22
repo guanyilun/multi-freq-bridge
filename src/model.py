@@ -211,7 +211,7 @@ class Cluster():
         # Electron density projected map
         beta_density_map_2d = (1 + (r / rc_pix)**2.)**(-1.5*self.beta + 0.5)
 
-        SZ_params.Te = self.T_e
+        SZ_params.Te = self.Te
 
         I = SZ.compute_combo(SZ_params, DI=True) * 10**6. # Jy/sr
 
