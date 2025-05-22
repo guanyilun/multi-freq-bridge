@@ -101,31 +101,31 @@ class Filament():
         sz_signal = numerator / bandpass_int
 
         # dust signal
-        freq_ref = 545 
-        T_D = 20 
-        beta_D = 1.5
+        # freq_ref = 545 
+        # T_D = 20 
+        # beta_D = 1.5
     
-        x_dust = (const_h * freq_array) * (1 + z) / (const_k_B * T_D)     
-        x_ref = (const_h * freq_ref) / (const_k_B * T_D)
+        # x_dust = (const_h * freq_array) * (1 + z) / (const_k_B * T_D)     
+        # x_ref = (const_h * freq_ref) / (const_k_B * T_D)
         
-        term_ref = (np.exp(x_ref) - 1)
-        term_dust = (np.exp(x_dust) - 1)
+        # term_ref = (np.exp(x_ref) - 1)
+        # term_dust = (np.exp(x_dust) - 1)
         
-        term_power = (freq_array * (1+z) / freq_ref)**(beta_D + 3)
+        # term_power = (freq_array * (1+z) / freq_ref)**(beta_D + 3)
 
-        I_dust = self.A_D * term_power * (term_ref / term_dust) 
+        # I_dust = self.A_D * term_power * (term_ref / term_dust) 
         
-        numerator_dust = np.trapz(y=bandpass * I_dust,
-                                    x=freq_array, dx=del_freq)
+        # numerator_dust = np.trapz(y=bandpass * I_dust,
+        #                             x=freq_array, dx=del_freq)
         
-        dust_signal = numerator_dust / bandpass_int
+        # dust_signal = numerator_dust / bandpass_int
 
         # modulate dust signal with bridge shape (mesa model)
         # total_model = bridge_shape * (sz_signal + dust_signal)
 
         sz_model = bridge_shape * sz_signal
-        dust_model = bridge_shape * dust_signal
-        total_model = sz_model + dust_model
+        #dust_model = bridge_shape * dust_signal
+        total_model = sz_model
 
         #return total_model, sz_model, dust_model
     
@@ -221,29 +221,31 @@ class Cluster():
         sz_signal = numerator / (bandpass_int) # SZ model
             
         # Dust emission treatment    
-        freq_ref = 545 
-        T_D = 20 
-        beta_D = 1.5
+        # freq_ref = 545 
+        # T_D = 20 
+        # beta_D = 1.5
     
-        x_dust = (const_h * freq_array) * (1 + z) / (const_k_B * T_D)     
-        x_ref = (const_h * freq_ref) / (const_k_B * T_D)
+        # x_dust = (const_h * freq_array) * (1 + z) / (const_k_B * T_D)     
+        # x_ref = (const_h * freq_ref) / (const_k_B * T_D)
         
-        term_ref = (np.exp(x_ref) - 1)
-        term_dust = (np.exp(x_dust) - 1)
+        # term_ref = (np.exp(x_ref) - 1)
+        # term_dust = (np.exp(x_dust) - 1)
         
-        term_power = (freq_array * (1+z) / freq_ref)**(beta_D + 3)
+        # term_power = (freq_array * (1+z) / freq_ref)**(beta_D + 3)
 
-        I_dust = self.A_D * term_power * (term_ref / term_dust) 
+        # I_dust = self.A_D * term_power * (term_ref / term_dust) 
         
-        numerator_dust = np.trapz(y=bandpass * I_dust,
-                                    x=freq_array, dx=del_freq)
+        # numerator_dust = np.trapz(y=bandpass * I_dust,
+        #                             x=freq_array, dx=del_freq)
         
-        dust_signal = numerator_dust / bandpass_int
+        # dust_signal = numerator_dust / bandpass_int
 
         sz_model = beta_density_map_2d * sz_signal
-        dust_model = beta_density_map_2d * dust_signal
-        total_model = sz_model + dust_model
+        # dust_model = beta_density_map_2d * dust_signal
         
+        
+        # total_model = sz_model + dust_model
+        total_model = sz_model
         
         #return total_model, sz_model, dust_model, SZ_params, I_dust
         
