@@ -105,12 +105,12 @@ smooth_signal_pix: 1.25
 smooth_noise_pix: 1.25
 smooth_total_pix: 1.25 # pixels the sigma
 apply_region_weight: false
-cluster_region_noise_rescale: true
+cluster_region_noise_rescale: false
 cluster_region_noise_rescale_lmin: 3000
 apply_transfer_to_tpsd: false
 rescale_by_transfer: false
-whiten_planck: true
-whiten_act: true
+whiten_planck: false
+whiten_act: false
 use_cluster_only_for_noise: false
 # Miscellaneaus parameters
 temp_model_type: isothermal
@@ -128,7 +128,7 @@ data:
   # - 44_npipe_planck_sky
   # - 70_npipe_planck_sky
   - 100_npipe_planck_sky
-  # - 143_npipe_planck_sky
-  # - 217_npipe_planck_sky
+  - 143_npipe_planck_sky
+  - 217_npipe_planck_sky
   # - 353_npipe_planck_sky
   # - 545_npipe_planck_sky
