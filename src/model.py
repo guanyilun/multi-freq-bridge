@@ -18,6 +18,10 @@ const_c = 299792458.0 # m / s
 const_k_B = 1.380649e-23 # J / K
 const_h = 6.626070149999999e-25 # J / GHz
 
+filament_Te = 6.4
+a399_Te = 7.23
+a401_Te = 8.47
+
 class Filament():
 
     def __init__(self, theta, model_choice):
@@ -27,25 +31,15 @@ class Filament():
 
     def initialize(self, theta):
         if self.model_choice == "fit_vavg":
-            self.ra_pix = theta[18]
-            self.dec_pix = theta[19]
-            self.l0_pix = theta[20]
-            self.w0_pix = theta[21]
-            self.Dtau = theta[22]
-            self.Te = theta[23]
-            self.A_D = theta[24]
-            self.fil_v_avg = theta[25]
+            self.ra_pix = theta[14]
+            self.dec_pix = theta[15]
+            self.l0_pix = theta[16]
+            self.w0_pix = theta[17]
+            self.Dtau = theta[18]
+            self.fil_v_avg = theta[19]
             self.theta_bridge = np.deg2rad(117)
-        elif self.model_choice == "fit_individual":
-            self.ra_pix = theta[20]
-            self.dec_pix = theta[21]
-            self.l0_pix = theta[22]
-            self.w0_pix = theta[23]
-            self.Dtau = theta[24]
-            self.Te = theta[25]
-            self.A_D = theta[26]
-            self.fil_v_avg = theta[27]
-            self.theta_bridge = np.deg2rad(117)
+
+            self.Te = filament_Te
         else:
             raise ValueError("Invalid model choice.")
 
@@ -133,9 +127,9 @@ class Filament():
         dust_model = bridge_shape * dust_signal
         total_model = sz_model + dust_model
 
-        return total_model, sz_model, dust_model
+        #return total_model, sz_model, dust_model
     
-        #return total_model
+        return total_model
 
 class Cluster():
     """
@@ -171,8 +165,10 @@ class Cluster():
         if self.model_choice == "fit_vavg":
             if self.name == "abell401":
                 vc = self.v_avg + (520 / 2)
+                self.Te = a401_Te
             elif self.name == "abell399":
                 vc = self.v_avg - (520 / 2)
+                self.Te = a399_Te
         elif self.model_choice == "fit_individual":
             vc = self.v_avg
         
@@ -244,16 +240,14 @@ class Cluster():
         
         dust_signal = numerator_dust / bandpass_int
 
-        # total_model = beta_density_map_2d * (sz_signal + dust_signal)
-
         sz_model = beta_density_map_2d * sz_signal
         dust_model = beta_density_map_2d * dust_signal
         total_model = sz_model + dust_model
         
         
-        return total_model, sz_model, dust_model, SZ_params, I_dust
+        #return total_model, sz_model, dust_model, SZ_params, I_dust
         
-        #return total_model
+        return total_model
 
     def initialize(self, theta):
 
@@ -266,47 +260,18 @@ class Cluster():
                 self.R = theta[4]
                 self.theta_cluster = np.deg2rad(theta[5])
                 self.Dtau = theta[6]
-                self.T_e = theta[7]
-                self.A_D = theta[8]
-                self.v_avg = theta[25]
+                self.v_avg = theta[19]
 
             elif self.name == "abell399":
-                self.ra_pix = theta[9]
-                self.dec_pix = theta[10]
-                self.beta = theta[11]
-                self.rc_arcmin = theta[12]
-                self.R = theta[13]
-                self.theta_cluster = np.deg2rad(theta[14])
-                self.Dtau = theta[15]
-                self.T_e = theta[16]
-                self.A_D = theta[17]
-                self.v_avg = theta[25]
-            else:
-                raise ValueError("Invalid cluster name.")
-        
-        elif self.model_choice == "fit_individual":
-            if self.name == "abell401":
-                self.ra_pix = theta[0]
-                self.dec_pix = theta[1]
-                self.beta = theta[2]
-                self.rc_arcmin = theta[3]
-                self.R = theta[4]
-                self.theta_cluster = np.deg2rad(theta[5])
-                self.Dtau = theta[6]
-                self.T_e = theta[7]
-                self.A_D = theta[8]
-                self.v_avg = theta[9]
-            elif self.name == "abell399":
-                self.ra_pix = theta[10]
-                self.dec_pix = theta[11]
-                self.beta = theta[12]
-                self.rc_arcmin = theta[13]
-                self.R = theta[14]
-                self.theta_cluster = np.deg2rad(theta[15])
-                self.Dtau = theta[16]
-                self.T_e = theta[17]
-                self.A_D = theta[18]
+                self.ra_pix = theta[7]
+                self.dec_pix = theta[8]
+                self.beta = theta[9]
+                self.rc_arcmin = theta[10]
+                self.R = theta[11]
+                self.theta_cluster = np.deg2rad(theta[12])
+                self.Dtau = theta[13]
                 self.v_avg = theta[19]
             else:
                 raise ValueError("Invalid cluster name.")
-
+        else: 
+            raise ValueError("Invalid model choice.")
