@@ -125,11 +125,9 @@ class Filament():
 
         sz_model = bridge_shape * sz_signal
         #dust_model = bridge_shape * dust_signal
-        total_model = sz_model
-
         #return total_model, sz_model, dust_model
     
-        return total_model
+        return sz_model
 
 class Cluster():
     """
@@ -245,11 +243,8 @@ class Cluster():
         
         
         # total_model = sz_model + dust_model
-        total_model = sz_model
         
-        #return total_model, sz_model, dust_model, SZ_params, I_dust
-        
-        return total_model
+        return sz_model
 
     def initialize(self, theta):
 
