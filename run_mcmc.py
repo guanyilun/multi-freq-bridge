@@ -206,10 +206,11 @@ def lnprior(theta):
         check_v_avg = cf['v_avg_min'] < theta[25] < cf['v_avg_max']
         
         if check_c1 and check_c2 and check_v_avg and check_fil:
-            term1 = -0.5 * ( (theta[7]-cf['c1_Te_mean'])**2. / cf['c1_Te_std']**2 )
-            term2 = -0.5 * ( (theta[16]-cf['c2_Te_mean'])**2. / cf['c2_Te_std']**2 )
-            term3 = -0.5 * ( (theta[23]-cf['fil_Te_mean'])**2. / cf['fil_Te_std']**2 )
-            return term1 + term2 + term3
+            #term1 = -0.5 * ( (theta[7]-cf['c1_Te_mean'])**2. / cf['c1_Te_std']**2 )
+            #term2 = -0.5 * ( (theta[16]-cf['c2_Te_mean'])**2. / cf['c2_Te_std']**2 )
+            #term3 = -0.5 * ( (theta[23]-cf['fil_Te_mean'])**2. / cf['fil_Te_std']**2 )
+            #return term1 + term2 + term3
+            return 0.0
         else:
             return -np.inf
     
