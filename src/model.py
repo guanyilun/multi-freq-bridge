@@ -138,9 +138,7 @@ class Cluster():
     def __init__(self, theta, name, model_choice): 
         self.name = name
         self.model_choice = model_choice
-
         self.initialize(theta=theta)
-
 
     def szmodel(self, 
               frequency, 
@@ -160,7 +158,13 @@ class Cluster():
         SZ_params.beta_order = 2
         SZ_params.Dtau = self.Dtau
 
-        
+        if self.model_choice == "fit_vavg":
+            if self.name == "abell401":
+                vc = self.v_avg + (self.vdelta / 2)
+            elif self.name == "abell399":
+                vc = self.v_avg - (self.vdelta / 2)
+        else:
+            raise ValueError("Invalid model choice.")
         
         SZ_params.betac = np.abs(vc) * 1000 / const_c
 
