@@ -28,14 +28,14 @@ class Filament():
     def initialize(self, theta):
         
         if self.model_choice == "fit_vavg":
-            self.ra_pix = theta[20]
-            self.dec_pix = theta[21]
-            self.l0_pix = theta[22]
-            self.w0_pix = theta[23]
-            self.Dtau = theta[24]
-            self.Te = theta[25]
-            self.A_D = theta[26]
-            self.fil_v_avg = theta[27]
+            self.ra_pix = theta[18]
+            self.dec_pix = theta[19]
+            self.l0_pix = theta[20]
+            self.w0_pix = theta[21]
+            self.Dtau = theta[22]
+            self.T_e = theta[23]
+            self.A_D = theta[24]
+            self.fil_v_avg = theta[25]
             self.theta_bridge = np.deg2rad(117)
         else:
             raise ValueError("Invalid model choice.")
@@ -141,6 +141,7 @@ class Cluster():
 
         self.initialize(theta=theta)
 
+
     def szmodel(self, 
               frequency, 
               z,
@@ -159,7 +160,7 @@ class Cluster():
         SZ_params.beta_order = 2
         SZ_params.Dtau = self.Dtau
 
-        vc = self.v_avg
+        
         
         SZ_params.betac = np.abs(vc) * 1000 / const_c
 
@@ -243,6 +244,10 @@ class Cluster():
     def initialize(self, theta):
 
         if self.model_choice == "fit_vavg":
+            
+            self.vavg = theta[25]
+            self.vdelta = theta[26]
+
             if self.name == "abell401":
                 self.ra_pix = theta[0]
                 self.dec_pix = theta[1]
@@ -253,19 +258,17 @@ class Cluster():
                 self.Dtau = theta[6]
                 self.T_e = theta[7]
                 self.A_D = theta[8]
-                self.v_avg = theta[9]
 
             elif self.name == "abell399":
-                self.ra_pix = theta[10]
-                self.dec_pix = theta[11]
-                self.beta = theta[12]
-                self.rc_arcmin = theta[13]
-                self.R = theta[14]
-                self.theta_cluster = np.deg2rad(theta[15])
-                self.Dtau = theta[16]
-                self.T_e = theta[17]
-                self.A_D = theta[18]
-                self.v_avg = theta[19]
+                self.ra_pix = theta[9]
+                self.dec_pix = theta[10]
+                self.beta = theta[11]
+                self.rc_arcmin = theta[12]
+                self.R = theta[13]
+                self.theta_cluster = np.deg2rad(theta[14])
+                self.Dtau = theta[15]
+                self.T_e = theta[16]
+                self.A_D = theta[17]
             else:
                 raise ValueError("Invalid cluster name.")
         
