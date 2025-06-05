@@ -33,7 +33,7 @@ class Filament():
             self.l0_pix = theta[20]
             self.w0_pix = theta[21]
             self.Dtau = theta[22]
-            self.T_e = theta[23]
+            self.Te = theta[23]
             self.A_D = theta[24]
             self.fil_v_avg = theta[25]
             self.theta_bridge = np.deg2rad(117)
