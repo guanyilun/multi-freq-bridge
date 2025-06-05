@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -N mcmc_ajay_case21
+#PBS -N mcmc_ajay_case22
 #PBS -o logs_ajay/mf_baseline.out
 #PBS -e logs_ajay/mf_baseline.err
 #PBS -l walltime=2:00:00
@@ -12,7 +12,7 @@ module load miniconda
 module load intel
 module load openmpi
 
-name=case21
+name=case22
 prefix=baseline
 # config=configs/${name}.yaml
 # odir=/home/agill/multi-freq-bridge/run_ajay/${name}
