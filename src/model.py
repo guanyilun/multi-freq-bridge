@@ -160,9 +160,9 @@ class Cluster():
 
         if self.model_choice == "fit_vavg":
             if self.name == "abell401":
-                vc = self.v_avg + (self.vdelta / 2)
+                vc = self.vavg + (self.vdelta / 2)
             elif self.name == "abell399":
-                vc = self.v_avg - (self.vdelta / 2)
+                vc = self.vavg - (self.vdelta / 2)
         else:
             raise ValueError("Invalid model choice.")
         
