@@ -3,8 +3,8 @@
 #PBS -o logs_ajay/mf_baseline.out
 #PBS -e logs_ajay/mf_baseline.err
 #PBS -l walltime=18:00:00
-#PBS -l nodes=2:ppn=32
-#PBS -q greenq
+#PBS -l nodes=4:ppn=16
+#PBS -q sandyq
 
 cd $PBS_O_WORKDIR
 module load miniconda
