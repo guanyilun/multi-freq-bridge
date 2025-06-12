@@ -224,6 +224,10 @@ def get_r500(z, mass):
 
     r500_pix = r500_arcmin / pixel_scale
 
+    print(f"r500_pix: {r500_pix.value} pixels")
+    print(f"r500_arcmin: {r500_arcmin.value} arcmin")
+    print(f"r500_Mpc: {r_Mpc.value} Mpc")
+
     return r500_pix.value
     
 def flux_factor(array, freq):
