@@ -19,7 +19,7 @@ c1_R_min: 0.2
 c1_R_max: 2
 c1_theta_min: 90
 c1_theta_max: 140.0
-c1_Te_mean: 8.8935
+c1_Te_mean: 9.317
 c1_Te_std: 0.25
 c1_mass: 10.2
 c1_z: 0.073664
@@ -50,7 +50,7 @@ c2_R_min: 0.2
 c2_R_max: 3
 c2_theta_min: 60
 c2_theta_max: 170
-c2_Te_mean: 7.5915
+c2_Te_mean: 7.953
 c2_Te_std: 0.19
 c2_mass: 8.7
 c2_z: 0.071806
@@ -82,7 +82,7 @@ fil_A_D_min: 0
 fil_A_D_max: 1000000
 fil_Te_min: 1
 fil_Te_max: 15
-fil_Te_mean: 6.846
+fil_Te_mean: 7.172
 fil_Te_std: 0.35
 v_avg_min: -10000
 v_avg_max: 10000
