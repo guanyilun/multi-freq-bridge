@@ -314,7 +314,10 @@ def lnlike(theta):
                                 z=cf['fil_z'],
                                 muo=cf['fil_muo'])
         
-        fit_model = np.fft.fft2(c1_model + c2_model + fil_model) * beam_list_array[idx]
+        #fit_model = np.fft.fft2(c1_model + c2_model + fil_model) * beam_list_array[idx]
+        fit_model = np.fft.fft2(c1_model + c2_model + fil_model) * apod_mask * apod_mask
+        fit_model /= mean_apod_mask2
+        fit_model *= beam_list_array[idx]
         
         resid_loop = data_list_array[idx].ravel() - fit_model.ravel()
         
@@ -351,7 +354,7 @@ def main(config_data_fname, cov_dir=cov_dir, outdir=dir_base):
     global fil_l0_min_pix, fil_l0_max_pix, fil_w0_min_pix, fil_w0_max_pix
     global fil_ra_pix, fil_dec_pix
 
-    global apod_mask, mean_apod_mask
+    global apod_mask, mean_apod_mask, mean_apod_mask2
 
     global xgrid, ygrid
     global c1_r500_pix, c2_r500_pix
@@ -426,6 +429,7 @@ def main(config_data_fname, cov_dir=cov_dir, outdir=dir_base):
 
     data_wcs = data_wcs_list[0]
     mean_apod_mask = np.mean(apod_mask)
+    mean_apod_mask2 = np.mean(apod_mask**2)
 
     # Covariance appender
     print("Appending covariance.")
