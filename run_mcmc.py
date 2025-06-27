@@ -315,10 +315,9 @@ def lnlike(theta):
                                 muo=cf['fil_muo'])
         
         #fit_model = np.fft.fft2(c1_model + c2_model + fil_model) * beam_list_array[idx]
-        fit_model = np.fft.fft2(c1_model + c2_model + fil_model) * apod_mask * apod_mask
-        fit_model /= mean_apod_mask2
-        fit_model *= beam_list_array[idx]
-        
+        total_model = c1_model + c2_model + fil_model
+        total_model_apod = total_model * apod_mask
+        fit_model = ( np.fft.fft2(total_model_apod) * beam_list_array[idx] ) / mean_apod_mask
         resid_loop = data_list_array[idx].ravel() - fit_model.ravel()
         
         resids.append(resid_loop)
