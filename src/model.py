@@ -20,8 +20,9 @@ const_h = 6.626070149999999e-25 # J / GHz
 
 class Filament():
 
-    def __init__(self, theta, model_choice):
+    def __init__(self, theta, model_choice, return_type="only_model"):
         self.model_choice = model_choice
+        self.return_type = return_type
 
         self.initialize(theta=theta)
 
@@ -133,9 +134,12 @@ class Filament():
         dust_model = bridge_shape * dust_signal
         total_model = sz_model + dust_model
 
-        #return total_model, sz_model, dust_model
-    
-        return total_model
+        if self.return_type == "only_model":
+            return total_model
+        elif self.return_type == "sz_dust_model":
+            return total_model, sz_model, dust_model
+        else:
+            raise ValueError("Invalid return type. Choose 'only_model' or 'sz_dust_model'.")
 
 class Cluster():
     """
@@ -144,9 +148,10 @@ class Cluster():
     Dust emission (Modified Blackbody)
     """
 
-    def __init__(self, theta, name, model_choice): 
+    def __init__(self, theta, name, model_choice, return_type="only_model"): 
         self.name = name
         self.model_choice = model_choice
+        self.return_type = return_type
 
         self.initialize(theta=theta)
 
@@ -250,9 +255,12 @@ class Cluster():
         dust_model = beta_density_map_2d * dust_signal
         total_model = sz_model + dust_model
         
-        #return total_model, sz_model, dust_model, SZ_params, I_dust
-        
-        return total_model
+        if self.return_type == "only_model":
+            return total_model
+        elif self.return_type == "sz_dust_model":
+            return total_model, sz_model, dust_model, SZ_params, I_dust
+        else:
+            raise ValueError("Invalid return type. Choose 'only_model' or 'sz_dust_model'.")
 
     def initialize(self, theta):
 
