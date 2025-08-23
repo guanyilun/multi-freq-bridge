@@ -2,7 +2,7 @@
 #PBS -N mcmc_ajay_case43
 #PBS -o logs_ajay/mf_baseline.out
 #PBS -e logs_ajay/mf_baseline.err
-#PBS -l walltime=4:00:00
+#PBS -l walltime=16:00:00
 #PBS -l nodes=1:ppn=48
 #PBS -q starq
 
