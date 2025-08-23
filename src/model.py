@@ -57,13 +57,19 @@ class Filament():
         SZ_params.Dtau = self.Dtau
 
         # TESTING
-        self.fil_v_avg = 0
         SZ_params.betac = np.abs(self.fil_v_avg) * 1000 / const_c
 
+        # old
+        # if self.fil_v_avg < 0:
+        #     SZ_params.muc = -1
+        # else:
+        #     SZ_params.muc = 1
+
+        # old
         if self.fil_v_avg < 0:
-            SZ_params.muc = -1
-        else:
             SZ_params.muc = 1
+        else:
+            SZ_params.muc = -1
 
         # # Set higher order terms to zero
         SZ_params.means_assign_omegas(0, 0, 0)
@@ -163,16 +169,18 @@ class Cluster():
 
         vc = self.v_avg
 
-        # CHANGING HERE FOR TESTING, REMOVE
-        vc = 0
-        
         SZ_params.betac = np.abs(vc) * 1000 / const_c
 
+        # if vc < 0:
+        #     SZ_params.muc = -1
+        # else:
+        #     SZ_params.muc = 1
+
         if vc < 0:
-            SZ_params.muc = -1
-        else:
             SZ_params.muc = 1
-        
+        else:
+            SZ_params.muc = -1
+
         # # Set higher order terms to zero
         SZ_params.means_assign_omegas(0, 0, 0)
         SZ_params.means_assign_sigmas(0, 0, 0)
