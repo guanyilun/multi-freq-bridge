@@ -57,6 +57,7 @@ class Filament():
         SZ_params.Dtau = self.Dtau
 
         # TESTING
+       # self.fil_v_avg = 0
         SZ_params.betac = np.abs(self.fil_v_avg) * 1000 / const_c
 
         # old
@@ -168,6 +169,9 @@ class Cluster():
         SZ_params.Dtau = self.Dtau
 
         vc = self.v_avg
+        
+        # TESTING
+        #vc = 0
 
         SZ_params.betac = np.abs(vc) * 1000 / const_c
 
