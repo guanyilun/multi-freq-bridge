@@ -56,17 +56,8 @@ class Filament():
         SZ_params.beta_order = 2
         SZ_params.Dtau = self.Dtau
 
-        # TESTING
-       # self.fil_v_avg = 0
         SZ_params.betac = np.abs(self.fil_v_avg) * 1000 / const_c
 
-        # old
-        # if self.fil_v_avg < 0:
-        #     SZ_params.muc = -1
-        # else:
-        #     SZ_params.muc = 1
-
-        # old
         if self.fil_v_avg < 0:
             SZ_params.muc = 1
         else:
@@ -133,9 +124,9 @@ class Filament():
         dust_model = bridge_shape * dust_signal
         total_model = sz_model + dust_model
 
-        return total_model, sz_model, dust_model
+        #return total_model, sz_model, dust_model
 
-        #return total_model
+        return sz_model
 
 class Cluster():
     """
@@ -169,16 +160,7 @@ class Cluster():
         SZ_params.Dtau = self.Dtau
 
         vc = self.v_avg
-        
-        # TESTING
-        #vc = 0
-
         SZ_params.betac = np.abs(vc) * 1000 / const_c
-
-        # if vc < 0:
-        #     SZ_params.muc = -1
-        # else:
-        #     SZ_params.muc = 1
 
         if vc < 0:
             SZ_params.muc = 1
@@ -253,7 +235,7 @@ class Cluster():
         total_model = sz_model + dust_model
         
         
-        return total_model, sz_model, dust_model, SZ_params, I_dust
+        return sz_model
 
         #return total_model
 
