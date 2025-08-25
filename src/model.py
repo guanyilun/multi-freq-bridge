@@ -235,9 +235,9 @@ class Cluster():
         total_model = sz_model + dust_model
         
         
-        return sz_model
+        #return sz_model
 
-        #return total_model
+        return sz_model
 
     def initialize(self, theta):
 
