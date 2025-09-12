@@ -29,4 +29,4 @@ echo "Making covariance matrix"
 python cov_maker.py --config ${config} --cov ${cov} 
 
 echo "Running MCMC"
-mpirun -n 48 python run_mcmc.py --config ${config} --cov ${cov} --odir ${odir}
+mpirun -n 48 python3 run_mcmc.py --config ${config} --cov ${cov} --odir ${odir}
