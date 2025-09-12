@@ -126,7 +126,7 @@ class Filament():
 
         #return total_model, sz_model, dust_model
 
-        return sz_model
+        return total_model
 
 class Cluster():
     """
@@ -237,7 +237,7 @@ class Cluster():
         
         #return sz_model
 
-        return sz_model
+        return total_model
 
     def initialize(self, theta):
 
