@@ -230,7 +230,9 @@ def lnlike(theta):
                                 z=cf['fil_z'],
                                 muo=cf['fil_muo'])
         
-        fit_model = np.fft.fft2(c1_model + c2_model + fil_model) * beam_list_array[idx] * apod_mask / mean_apod_mask
+        # testing
+        model_real = (c1_model + c2_model + fil_model) * apod_mask
+        fit_model = np.fft.fft2(model_real) * beam_list_array[idx] / mean_apod_mask
         
         resid_loop = data_list_array[idx].ravel() - fit_model.ravel()
         
@@ -336,7 +338,7 @@ def main(config_data_fname, cov_dir=cov_dir, outdir=dir_base):
         apod_mask = (enmap.apod(data_coadd*0+1, cf['apod_pix']))
         
         # testing
-        data_coadd = np.fft.fft2(data_coadd) * apod_mask / np.mean(apod_mask)
+        data_coadd = np.fft.fft2(data_coadd * apod_mask) / np.mean(apod_mask)
         
         data_list.append(data_coadd)
         beam_list.append(np.array(beam_tmp))
