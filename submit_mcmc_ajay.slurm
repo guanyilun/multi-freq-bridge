@@ -8,7 +8,7 @@
 
 cd $PBS_O_WORKDIR
 module load miniconda
-module load python/3.10.2
+module load python/3.12.11
 module load intel
 module load openmpi
 
@@ -26,7 +26,7 @@ config=configs/${name}_ajay.yaml
 # sed -i "s/smooth_total_pix.*/smooth_total_pix: 1.25/g" ${config}
 
 echo "Making covariance matrix"
-python cov_maker.py --config ${config} --cov ${cov} 
+python3 cov_maker.py --config ${config} --cov ${cov} 
 
 echo "Running MCMC"
 mpirun -n 48 python3 run_mcmc.py --config ${config} --cov ${cov} --odir ${odir}
