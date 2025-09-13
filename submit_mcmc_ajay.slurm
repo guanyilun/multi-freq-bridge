@@ -9,6 +9,7 @@
 cd $PBS_O_WORKDIR
 #module load miniconda
 module load python/3.12.11
+module load gsl/2.7.1
 module load intel
 module load openmpi
 
