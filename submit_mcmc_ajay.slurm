@@ -10,6 +10,7 @@ cd $PBS_O_WORKDIR
 module load python/3.12.11
 module load intel
 module load openmpi
+module load gsl/2.7.1
 
 name=case55
 prefix=baseline
