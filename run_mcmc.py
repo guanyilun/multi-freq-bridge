@@ -338,7 +338,7 @@ def main(config_data_fname, cov_dir=cov_dir, outdir=dir_base):
         
         apod_mask = (enmap.apod(data_coadd*0+1, cf['apod_pix']))
 
-        data_list.append(np.fft.fft2(data_coadd * apod_mask) / mean_apod_mask)
+        data_list.append(np.fft.fft2(data_coadd * apod_mask) / np.mean(apod_mask) )
         beam_list.append(np.array(beam_tmp))
 
         data_wcs_list.append(data_wcs) 
