@@ -56,6 +56,8 @@ class Filament():
         SZ_params.beta_order = 2
         SZ_params.Dtau = self.Dtau
 
+        # TESTING
+        self.fil_v_avg = 1e-30
         SZ_params.betac = np.abs(self.fil_v_avg) * 1000 / const_c
 
         if self.fil_v_avg < 0:
@@ -160,6 +162,8 @@ class Cluster():
         SZ_params.Dtau = self.Dtau
 
         vc = self.v_avg
+        # TESTING
+        vc = 1e-30 
         SZ_params.betac = np.abs(vc) * 1000 / const_c
 
         if vc < 0:
@@ -200,6 +204,7 @@ class Cluster():
         beta_density_map_2d = (1 + (r / rc_pix)**2.)**(-1.5*self.beta + 0.5)
 
         SZ_params.Te = self.T_e
+
 
         I = SZ.compute_combo(SZ_params, DI=True) * 10**6. # Jy/sr
 
