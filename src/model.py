@@ -57,7 +57,7 @@ class Filament():
         SZ_params.Dtau = self.Dtau
 
         # TESTING
-        #self.fil_v_avg = 1e-30
+        self.fil_v_avg = 1e-30
         SZ_params.betac = np.abs(self.fil_v_avg) * 1000 / const_c
 
         if self.fil_v_avg < 0:
@@ -128,7 +128,7 @@ class Filament():
 
         #return total_model, sz_model, dust_model
 
-        return total_model
+        return sz_model
 
 class Cluster():
     """
@@ -163,6 +163,7 @@ class Cluster():
 
         vc = self.v_avg
         # TESTING
+        vc = 1e-30
         SZ_params.betac = np.abs(vc) * 1000 / const_c
 
         if vc < 0:
@@ -241,7 +242,7 @@ class Cluster():
         
         #return sz_model
 
-        return total_model
+        return sz_model
 
     def initialize(self, theta):
 
